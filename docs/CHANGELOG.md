@@ -55,3 +55,32 @@
 
 หมายเหตุ: เวอร์ชันนี้ยังไม่มี Git tags หรือ release notes อย่างเป็นทางการ
 หากมีการ release จริง ควรสร้าง Git tag และอัปเดตส่วนนี้
+
+---
+
+## [v2.0.0] — Clean Slate Release (2026-09-23, commit 49c344d)
+
+**Fact**: Single root-commit history force-pushed to `origin main` (https://github.com/pppoipoit/Key-Scraper.git).
+No source-code changes in this release — docs bookkeeping only (CURRENT_TASK, HANDOFF, CHANGELOG).
+
+**Release status**: GitHub Release v2.0.0 NOT yet published (gh CLI not installed on this machine).
+Owner action required — publish at https://github.com/pppoipoit/Key-Scraper/releases/new with tag `v2.0.0`.
+
+**Release notes for owner to paste** (title: ✨ Elite Edition v2.0.0 — Clean Slate & Portfolio Ready):
+
+🎉 **Initial Public Release: Elite Edition v2.0.0**
+
+This is the 'Clean Slate' release of the LaptopKey Scraper. The repository has been completely restructured for professional portfolio showcase.
+
+**What's included in v2.0.0:**
+- 🚀 Parallel multi-URL scraping engine (up to 4 concurrent threads via ThreadPoolExecutor)
+- 🎨 Custom Dark UI with PIL-rendered gradient widgets
+- 📂 Automated brand detection and Korean/English folder structuring
+- 🛡️ Thread-safe UI architecture (root.after() pattern)
+- 📦 Ready-to-build Inno Setup configuration (relative paths)
+
+**Tech Stack:** Python 3.x | Tkinter | Pillow | BeautifulSoup4 | Requests | PyInstaller
+
+*Note: Compiled binaries (.exe) are not hosted on GitHub to keep the repository clean. Build from source using PyInstaller.*
+
+**© 2026 pppoipoit x DRKMTTR Studio**

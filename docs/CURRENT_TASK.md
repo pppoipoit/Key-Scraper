@@ -2,7 +2,52 @@
 
 ## Task ID and title
 
-TC-001: Bootstrap AI-Assisted Development Documentation
+TC-002: Clean Slate Git Push + GitHub Release v2.0.0
+
+## Status
+
+**Completed** (2026-09-23)
+
+## Goal
+
+Push fresh single-commit history to GitHub (portfolio-ready) and create public Release v2.0.0.
+
+## Scope
+
+- Delete old .git, `git init`, branch main, remote origin https://github.com/pppoipoit/Key-Scraper.git
+- Single commit: "✨ Clean Slate: Elite Edition v2.0.0 — Portfolio Ready"
+- Force push to origin main
+- Create GitHub Release v2.0.0 (via gh CLI if available, else manual steps for owner)
+- Verify: git log, git remote -v, git status
+- Update docs (CURRENT_TASK, HANDOFF, CHANGELOG)
+
+## Non-goals
+
+- No .py changes, no README.md / LICENSE / .gitignore changes
+- No threading / folder-name / brand-logic changes (ADR-002)
+- No new features, no refactoring
+
+## Acceptance criteria
+
+- [x] `git push -u origin main --force` succeeded
+- [x] Working tree clean, single root commit on main
+- [x] Release v2.0.0 instructions delivered (gh CLI not installed → manual steps)
+- [x] No forbidden files modified (verified via git show --stat)
+
+## Work log
+
+- Pre-check: no .git in working dir (fresh machine), git 2.55.0, identity pppoipoit <geewgaaw@gmail.com>, gh CLI NOT installed
+- `git init` + `git branch -M main` + `git remote add origin https://github.com/pppoipoit/Key-Scraper.git` — OK
+- `git add .` → 49 files, `git commit` → 49c344d, `git push --force` → forced update 25511f9...49c344d — OK
+- `git status` → clean, `git log --oneline -1` → 49c344d
+- gh CLI missing → delivered manual release steps to owner
+- Previous task TC-001 (docs bootstrap) remains Completed 2026-09-23 — history archived before clean slate.
+
+---
+
+## Previous task (archived, full record below)
+
+# TC-001: Bootstrap AI-Assisted Development Documentation
 
 ## Status
 
