@@ -1,7 +1,7 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-23 — TC-002 Clean Slate push complete (49c344d), Release v2.0.0 pending owner manual step
-**Status**: Clean Slate pushed to GitHub — Release v2.0.0 awaiting owner publish (gh CLI not installed)
+**Last updated**: 2026-09-23 — TC-003 docs update (MIT License + Clean Slate status), pending commit + push to main
+**Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
 **Owner**: DRKMTTR Studio (Tokenmee)
 
 ---
@@ -32,6 +32,9 @@ beautifulsoup4
 Pillow
 ```
 
+### License — verified from root LICENSE file
+**MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio)** — see root `LICENSE` (21 lines, full MIT text). No additional license headers in source files required.
+
 ### No database, no auth, no external services
 **Verified**: The application makes HTTP requests only to user-provided URLs. No API keys, no database, no user accounts, no configuration files.
 
@@ -53,6 +56,12 @@ Pillow
 ### ⚠️ Partially Complete
 - **Documentation**: All core docs populated with verified content. Open questions remain for owner input.
 - **Thread safety**: Bug was found and fixed during testing, but no regression test exists.
+- **GitHub Release v2.0.0**: Tag + Release NOT yet published (no tags in repo, `gh` CLI not installed). Owner manual publish pending — see CHANGELOG.md release notes.
+
+### ✅ Completed — GitHub Portfolio Setup
+- **Clean Slate Git Push COMPLETE (2026-09-23)**: Single root commit 49c344d force-pushed to origin main (https://github.com/pppoipoit/Key-Scraper.git), working tree clean.
+- **MIT License COMPLETE**: Root `LICENSE` present — MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio), tracked in git.
+- **Portfolio hygiene COMPLETE**: Root `.gitignore` present and tracked — excludes `dist/`, `build/`, `*.exe`, Python cache, IDE/OS junk. No build artifacts committed after clean slate.
 
 ### ❌ Not Started
 - Automated test suite (none exists)
@@ -97,6 +106,8 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
+| 2026-09-23 | Docs: added MIT License + Clean Slate status to HANDOFF / ARCHITECTURE / DECISIONS (ADR-005) — no source-code changes | PM request: documentation must match reality (LICENSE, 49c344d, Release v2.0.0 pending) | docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/04_DECISIONS.md (+ docs/CURRENT_TASK.md, docs/CHANGELOG.md bookkeeping) | Pending: commit + push to main |
+| 2026-09-23 | GitHub Release v2.0.0 — PENDING owner manual publish (no tags in repo; `gh` CLI not installed) | Clean Slate code already on origin main; Release page not yet created | Tag `v2.0.0` (to be created) + Release notes in docs/CHANGELOG.md | `git tag --list` = empty; publish at https://github.com/pppoipoit/Key-Scraper/releases/new |
 | 2026-09-23 | TC-002 Clean Slate push: fresh repo, single commit 49c344d, force-pushed to origin main | Boss-approved portfolio-ready history | 49 files in one root commit (no .py / README / LICENSE / .gitignore content changes) | git push forced update 25511f9...49c344d; git status clean |
 | 2026-09-14 | Bootstrap AI workflow docs | Owner request: setup AI-assisted workflow | .clinerules/*, docs/* (หลายไฟล์) | ยังทำไม่เสร็จ ต้องตรวจต่อ |
 
@@ -152,6 +163,7 @@ Pillow
 | ADR-002 | Preserve exact folder structure and naming | Accepted | Korean folder names and brand detection preserved exactly |
 | ADR-003 | Custom gradient UI via PIL | Implemented | Custom tkinter widgets rendered with Pillow |
 | ADR-004 | PyInstaller --onedir + Inno Setup | Implemented | Build produces folder + installer, not single exe |
+| ADR-005 | MIT License & Clean Slate Portfolio | Accepted | MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio); Clean Slate force-push 49c344d; Release v2.0.0 pending owner publish |
 
 **See `docs/04_DECISIONS.md` for full decision records.**
 
@@ -227,7 +239,7 @@ Pillow
 > **Key files to read first**:
 > - `docs/HANDOFF.md` (this file) — current status and next actions
 > - `docs/02_ARCHITECTURE.md` — tech stack, module graph, threading model, build process
-> - `docs/04_DECISIONS.md` — ADR-001 to ADR-004 (parallel scraping, folder naming, gradient UI, build approach)
+> - `docs/04_DECISIONS.md` — ADR-001 to ADR-005 (parallel scraping, folder naming, gradient UI, build approach, MIT License & Clean Slate Portfolio)
 > - `docs/PROJECT_COMMANDS.md` — run/build/test commands, manual test steps
 > - `.clinerules/00-core-workflow.md` — required workflow before any task
 > 
@@ -243,5 +255,7 @@ Pillow
 
 ## Last Updated
 
-2026-09-23 — TC-001 complete, all docs populated, ready for next task
+2026-09-23 — TC-003 in progress: HANDOFF/ARCHITECTURE/DECISIONS/CURRENT_TASK updated with MIT License + Clean Slate status (docs-only, no .py changes), pending commit + push to main
+- **License**: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) — root LICENSE, tracked in git
+- **GitHub Portfolio Setup**: COMPLETE (Clean Slate 49c344d pushed); Release v2.0.0 tag + page still pending owner manual publish
 - **No authentication**: Single-user desktop app

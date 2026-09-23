@@ -42,6 +42,8 @@ Key Scraper/
 ├── Create Installer.iss    # Inno Setup script for Key_Scraper_Setup.exe
 ├── README.txt              # Original documentation (English/Thai mix) by Santa Claude
 ├── dist/                   # Build output (Key_Scraper.exe in onedir/, Key_Scraper_Setup.exe in installer/)
+├── LICENSE                 # MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) — portfolio-ready open-source license
+├── .gitignore               # Excludes dist/, build/, *.exe, Python cache, venv/, IDE/OS junk — keeps Clean Slate history free of build artifacts
 └── docs/                   # Project documentation
 ```
 
@@ -267,6 +269,7 @@ See `docs/04_DECISIONS.md` for recorded decisions:
 - **ADR-002**: Preserve exact folder structure and naming (Accepted)
 - **ADR-003**: Custom gradient UI via PIL (Implemented)
 - **ADR-004**: PyInstaller --onedir + Inno Setup (Implemented)
+- **ADR-005**: MIT License & Clean Slate Portfolio (Accepted)
 
 ---
 

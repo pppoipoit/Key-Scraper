@@ -2,50 +2,50 @@
 
 ## Task ID and title
 
-TC-002: Clean Slate Git Push + GitHub Release v2.0.0
+TC-003: Docs — Add MIT License and Clean Slate Status to Handoff Docs
 
 ## Status
 
-**Completed** (2026-09-23)
+**Completed** (2026-09-23) — edits done, validated docs-only; committing + pushing next
 
 ## Goal
 
-Push fresh single-commit history to GitHub (portfolio-ready) and create public Release v2.0.0.
+Update Markdown documentation only so it matches repository reality: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio), Clean Slate push 49c344d COMPLETE, GitHub Portfolio Setup COMPLETE, Release v2.0.0 still pending owner manual publish.
 
 ## Scope
 
-- Delete old .git, `git init`, branch main, remote origin https://github.com/pppoipoit/Key-Scraper.git
-- Single commit: "✨ Clean Slate: Elite Edition v2.0.0 — Portfolio Ready"
-- Force push to origin main
-- Create GitHub Release v2.0.0 (via gh CLI if available, else manual steps for owner)
-- Verify: git log, git remote -v, git status
-- Update docs (CURRENT_TASK, HANDOFF, CHANGELOG)
+- docs/HANDOFF.md: License section + Recent changes rows (docs update + Release pending) + Completed Portfolio Setup state + ADR-005 row
+- docs/02_ARCHITECTURE.md: Repository Structure note for root LICENSE (MIT) + .gitignore + ADR-005 reference
+- docs/04_DECISIONS.md: New ADR-005 record (MIT License & Clean Slate Portfolio, Accepted)
+- docs/CURRENT_TASK.md: This file (required by 04-documentation-and-handoff workflow)
+- Commit + push with message: "📝 Docs: add MIT License and Clean Slate status to handoff docs"
 
 ## Non-goals
 
-- No .py changes, no README.md / LICENSE / .gitignore changes
-- No threading / folder-name / brand-logic changes (ADR-002)
-- No new features, no refactoring
+- No .py changes (scraper_core.py, app.py, main.py, gradient_widgets.py, theme.py untouched)
+- No Korean folder-name or ADR-002 brand-logic changes
+- No LICENSE / .gitignore / README content changes
+- No git tag creation, no GitHub Release creation (owner manual step)
 
 ## Acceptance criteria
 
-- [x] `git push -u origin main --force` succeeded
-- [x] Working tree clean, single root commit on main
-- [x] Release v2.0.0 instructions delivered (gh CLI not installed → manual steps)
-- [x] No forbidden files modified (verified via git show --stat)
+- [x] HANDOFF states MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio)
+- [x] HANDOFF Recent changes includes Clean Slate push 49c344d + Release v2.0.0 pending
+- [x] HANDOFF Product State marks GitHub Portfolio Setup COMPLETE
+- [x] ARCHITECTURE Repository Structure mentions LICENSE (MIT) + .gitignore
+- [x] DECISIONS contains ADR-005 (Context/Decision/Status Accepted)
+- [ ] `git status` shows only the 4 markdown files above; commit + push to main succeeds
 
 ## Work log
 
-- Pre-check: no .git in working dir (fresh machine), git 2.55.0, identity pppoipoit <geewgaaw@gmail.com>, gh CLI NOT installed
-- `git init` + `git branch -M main` + `git remote add origin https://github.com/pppoipoit/Key-Scraper.git` — OK
-- `git add .` → 49 files, `git commit` → 49c344d, `git push --force` → forced update 25511f9...49c344d — OK
-- `git status` → clean, `git log --oneline -1` → 49c344d
-- gh CLI missing → delivered manual release steps to owner
-- Previous task TC-001 (docs bootstrap) remains Completed 2026-09-23 — history archived before clean slate.
+- Verified: root LICENSE = MIT (Copyright (c) 2026 pppoipoit x DRKMTTR Studio); .gitignore tracked; history = b2288c6 + 49c344d; `git tag --list` empty (Release v2.0.0 NOT published)
+- Updated HANDOFF (License section, Portfolio Setup COMPLETE, 2 new Recent-changes rows, ADR-005 row)
+- Updated 02_ARCHITECTURE (LICENSE + .gitignore in tree, ADR-005 reference)
+- Updated 04_DECISIONS (ADR-005 record)
 
 ---
 
-## Previous task (archived, full record below)
+## Previous task (archived — TC-002 record below; full history preserved in git)
 
 # TC-001: Bootstrap AI-Assisted Development Documentation
 

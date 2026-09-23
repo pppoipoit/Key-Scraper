@@ -94,6 +94,24 @@ Template ต่อ decision:
 - Related files: README.txt, Create Installer.iss
 - Owner approval: Already approved (current build method)
 
+### ADR-005: MIT License & Clean Slate Portfolio
+
+- Date: 2026-09-23
+- Status: Accepted
+- Context: Project needed a clean public portfolio on GitHub. Old history contained build artifacts and local machine paths (e.g., hardcoded `D:\Google Drive\...` in installer script), unsuitable for public showcase.
+- Decision: Adopted MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) at root `LICENSE` and performed a Clean Slate force-push (single root commit 49c344d "✨ Clean Slate: Elite Edition v2.0.0 — Portfolio Ready") to remove build artifacts and local paths from history. Root `.gitignore` now excludes `dist/`, `build/`, `*.exe`, Python cache, venv/, IDE/OS junk. GitHub Release v2.0.0 pending owner manual publish (no tags in repo; `gh` CLI not installed).
+- Why: MIT License makes the portfolio project openly reusable with attribution; Clean Slate gives a professional single-commit public history without leaking local paths or binaries.
+- Alternatives considered:
+  - Keep old history with build artifacts (rejected — unprofessional for portfolio, leaks local paths)
+  - Proprietary / All-rights-reserved license (rejected — MIT preferred for public portfolio reuse)
+  - GPL license (rejected — MIT is more permissive for portfolio showcase)
+- Consequences:
+  - Public history rewritten (old commits superseded by 49c344d); collaborators must re-clone
+  - No `.py` changes, no Korean folder-name / ADR-002 logic changes — docs-only follow-up
+  - Release v2.0.0 tag + GitHub Release page still require owner manual step (see docs/CHANGELOG.md)
+- Related files/requirements: LICENSE, .gitignore, docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/CHANGELOG.md
+- Owner approval: PM (Mo-Mo) requested docs update 2026-09-23; license holder "pppoipoit x DRKMTTR Studio" per root LICENSE
+
 ---
 
 ## Template for new decisions
