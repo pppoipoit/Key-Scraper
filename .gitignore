@@ -1,0 +1,36 @@
+# Python cache & environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+.env
+
+# Build artifacts
+dist/
+build/
+*.spec
+*.egg-info/
+
+# Installer output (built .exe should not be committed)
+*.exe
+Output/
+
+# IDE / Editor junk
+.vscode/
+.idea/
+*.code-workspace
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+Desktop.ini
+
+# Logs & temp
+*.log
+*.tmp
+*.bak

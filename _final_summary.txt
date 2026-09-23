@@ -1,0 +1,110 @@
+﻿## สรุปการสร้างเอกสารและ workflow
+
+### ไฟล์ที่สร้างใน .clinerules/ (6 ไฟล์)
+- README.md - คำแนะนำการใช้งาน rules
+- 00-core-workflow.md - ขั้นตอนทำงานหลัก
+- 01-code-quality.md - มาตรฐานโค้ด
+- 02-security-and-data.md - ความปลอดภัยและข้อมูล
+- 03-testing-and-validation.md - การทดสอบและการตรวจสอบ
+- 04-documentation-and-handoff.md - การจัดการเอกสารและ handoff
+- 05-owner-communication.md - การสื่อสารกับเจ้าของโปรเจกต์
+
+### ไฟล์ที่สร้างใน docs/ (21 ไฟล์)
+Template ตามที่ระบุ:
+- docs/README.md - แผนผังเอกสาร
+- 00_PRODUCT.md - ภาพรวมผลิตภัณฑ์
+- 01_REQUIREMENTS.md - ข้อกำหนดสินค้า
+- 02_ARCHITECTURE.md - สถาปัตยกรรมเทคนิค
+- 03_UI_UX.md - การออกแบบ UI/UX
+- 04_DECISIONS.md - บันทึกข้อตัดสิน
+- 05_BACKLOG.md - รายการงาน
+- CURRENT_TASK.md - งานปัจจุบัน
+- HANDOFF.md - สถานะโปรเจกต์ปัจจุบัน
+- QA_CHECKLIST.md - ตรวจสอบคุณภาพ
+- GLOSSARY.md - คำศัพท์
+- CHANGELOG.md - ประวัติการเปลี่ยนแปลง
+- OPEN_QUESTIONS.md - คำถามเปิด
+- PROJECT_COMMANDS.md - คำสั่งรัน project
+
+### ไฟล์ใน docs/workflows/ (6 ไฟล์)
+- new-feature.md - เวิร์กโฟลิฟต์สำหรับฟีเจอร์ใหม่
+- bug-fix.md - เวิร์กโฟลิฟต์สำหรับการแก้บั๊ก
+- refactor.md - เวิร์กโฟลิฟต์สำหรับ refactor
+- code-review.md - เวิร์กโฟลิฟต์สำหรับ review โค้ด
+- release-check.md - เวิร์กโฟลิฟต์ก่อน release
+- emergency-rollback.md - เวิร์กโฟลิฟต์ฉุกเฉิน
+
+### คู่มือเจ้าของ (5 ไฟล์)
+- docs/START_HERE.md - หน้าแรกสำหรับเจ้าของ
+- docs/OWNER_PLAYBOOK.md - คู่มือคุมโปรเจกต์ทีละขั้น
+- docs/GIT_FOR_OWNER.md - Git สำหรับคนไม่เขียนโค้ด
+- docs/EMERGENCY_GUIDE.md - คู่มือฉุกเฉิน
+- docs/AI_COMMAND_CHEATSHEET.md - แชตชีท prompt สำหรับส่ง Cline
+
+### อัปเดตไฟล์ราก
+- README.md - เพิ่มส่วน AI-Assisted Development Workflow
+
+## สิ่งที่ตรวจพบใน repo (สรุป)
+- **Stack**: Python 3 + tkinter, requests, beautifulsoup4, Pillow, PyInstaller, Inno Setup
+- **Language**: Python 3.x (tkinter GUI)
+- **Dependencies**: requests, beautifulsoup4, Pillow
+- **ไม่มี database** - แอปเดสก์ท็อปสแตนด์อัลน์
+- **ไม่มี authentication/authorization**
+- **Thread safety สำคัญ** - UI ต้องแก้จาก main thread เท่านั้น
+- **Folder structure คงที่** - ต้องรักษา 4 หมวด + ชื่อแบรนด์ (ตามที่สั่งเด็ดขาด)
+- **สีธีมและ widget แบบ custom** - ใช้ PIL เพราะ tkinter ไม่ native support
+
+## สิ่งที่สร้าง/แก้ (สรุป)
+- **.clinerules/** ทั้ง 6 ไฟล์
+- **docs/** ทั้ง 21 ไฟล์ (template ครบตาม spec)
+- **docs/workflows/** 6 ไฟล์ (checklist ครบ)
+- **คู่มือเจ้าของ 5 ไฟล์**
+- **README.md ราก** (ต่อเติมส่วน AI workflow)
+
+## วิธีใช้หลังจากนี้
+
+### ตอนเริ่มฟีเจอร์ใหม่
+1. อ่าน docs/HANDOFF.md และ docs/CURRENT_TASK.md
+2. อ่าน docs/00_PRODUCT.md และ docs/01_REQUIREMENTS.md
+3. Cline เสนอแผน (ต้องรออนุมัติเจ้าของ)
+4. ถ้าอนุมัติ → Cline เริ่มทำงาน
+5. ทดสอบตาม Manual Test Steps
+6. สั่ง "APPROVE COMMIT" ถ้าผ่าน
+7. อัปเดต HANDOFF.md
+
+### ตอนจบ task
+1. ทดสอบว่างานผ่านแล้ว
+2. สั่ง "APPROVE COMMIT"
+3. รอ Cline commit และอัปเดต HANDOFF.md
+4. ตรวจสอบว่า git diff ไม่มีของนอก scope
+
+### ตอนย้ายไป New Task หรือเปลี่ยน AI chat
+1. ให้ Cline อัปเดต docs/HANDOFF.md ก่อนจบงาน
+2. เปิด New Task หรือ AI chat ใหม่
+3. อ่าน HANDOFF.md, CURRENT_TASK.md, DECISIONS.md
+4. เริ่มจาก Exact next task
+
+## คำถามที่ต้องตอบเพื่อเริ่มเก็บ Product Context (ไม่เกิน 12 ข้อ)
+
+1. แอปนี้แก้ปัญหาอะไรเป็นหลัก (ช่วยให้ผู้ใช้ดึงรูปคีย์บอร์ดจากเว็บไซต์ได้ง่ายขึ้น)
+2. ใครใช้ (เจ้าของ/ลูกค้ารายเดียวหรือหลายคน)
+3. user role มีอะไรบ้าง (ตอนนี้มี 1 Roll: Operator)
+4. ฟีเจอร์แรกที่สำคัญที่สุดคืออะไร (multi-URL parallel scraping)
+5. อะไรคือสิ่งที่ห้ามทำ (เปลี่ยนโครงสร้างโฟลเดอร์/ชื่อแบรนด์โดยไม่ได้รับอนุมัติ)
+6. มีระบบ login/payment/data สำคัญหรือไม่ (ไม่มี - เดสก์ท็อปสแตนด์อัลน์)
+7. นิยามความสำเร็จของ MVP คืออะไร (ดึงรูปได้ครบ โฟลเดอร์ถูกต้อง ไม่ค้าง)
+8. มีเว็บไซต์เป้าหมายกี่เว็บ (เปิดรับได้ทุกเว็บที่มีโครงสรucture ตามที่คาด)
+9. MAX_PARALLEL_URLS ต้องเป็นเท่าไหร่ (ค่าเริ่มต้น 4 แต่สามารถปรับได้)
+10. ต้องรองรับ macOS/Linux หรือไม่ (ตอนนี้ Windows เป็นหลัก)
+11. ต้องการ automated test หรือไม่ (ตอนนี้มี manual test เท่านั้น)
+12. มีข้อจำกัดด้านสี/รูปแบบอื่นที่ต้องรู้หรือไม่ (ต้องรักษา color palette จาก theme.py)
+
+## Next action
+
+อ่านไฟล์เหล่านี้ก่อนเริ่มงานครั้งแรก:
+docs/HANDOFF.md, docs/CURRENT_TASK.md, docs/04_DECISIONS.md
+
+จากนั้นให้ Cline เสนอแผนงานและรออนุมัติเจ้าของก่อนแก้โค้ด
+
+หรือใช้ prompt เปิดงานใหม่ได้ทันที:
+"อ่าน docs/HANDOFF.md, docs/CURRENT_TASK.md, docs/04_DECISIONS.md และเอกสารที่เกี่ยวข้องก่อน เริ่มจากสรุปความเข้าใจ แผน ไฟล์ที่จะกระทบ ความเสี่ยง และวิธีทดสอบ แล้วรออนุมัติก่อนแก้โค้ด"
