@@ -29,6 +29,22 @@
 
 ---
 
+## [2.0.1] - 2026-09-23
+
+### Changed
+
+- Simplified build: removed separate Win7/Win10 build scripts
+- Single `requirements.txt` with `Pillow<=9.5.0` for universal Windows support
+- Updated documentation to reflect single-build approach
+
+### Removed
+
+- `build_win7.bat`, `build_win10.bat`
+- `requirements-win7.txt`, `requirements-win10.txt`
+
+---
+
+
 ## [2.0.0] - 2026-06-23
 
 (จาก README.txt — เป็นเวอร์ชันปัจจุบันใน repository)

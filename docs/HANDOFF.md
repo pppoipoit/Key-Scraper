@@ -1,6 +1,6 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-27 — TC-004 Windows compatibility matrix + multi-version build setup (docs/config only), pending commit + push to main
+**Last updated**: 2026-09-27 — TC-005 Simplify Build: removed separate Win7/Win10 build files, single build for all Windows (Boss decision), commit + push to main
 **Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
 **Owner**: DRKMTTR Studio (Tokenmee)
 
@@ -38,8 +38,8 @@ Pillow
 ### No database, no auth, no external services
 **Verified**: The application makes HTTP requests only to user-provided URLs. No API keys, no database, no user accounts, no configuration files.
 
-### Windows 7 legacy support — documented 2026-09-27
-**Fact**: Windows 7/8 users MUST run Python 3.8.x (Python 3.9+ dropped Windows 7 support). Separate build configs exist: `requirements-win7.txt` + `build_win7.bat` (Pillow pinned `<=9.5.0`) and `requirements-win10.txt` + `build_win10.bat`. PyInstaller builds must match the target Python version. See `docs/WINDOWS_COMPATIBILITY.md` for the full matrix.
+### Windows 7 legacy support — single build (updated 2026-09-27)
+**Fact**: Python 3.8.x supports Windows 7, 8/8.1, 10, and 11 — ONE Python version covers all targets (Python 3.9+ dropped Windows 7 support). A single `requirements.txt` pins Pillow `<=9.5.0` (last version with full Windows 7 support), and ONE build command produces a build that runs on all supported Windows versions. PyInstaller builds must be produced on Python 3.8.x. See `docs/WINDOWS_COMPATIBILITY.md` for the full matrix.
 
 
 ## Current Product State
@@ -83,7 +83,7 @@ Pillow
 8. **Windows-specific icon** — icon.ico may not display on Linux/macOS
 9. **No log file** — logs are in-memory only, lost on close
 10. **No persistent config** — folder path not saved between sessions
-11. **Windows 7 requires Python 3.8.x only** — Python 3.9+ builds will not run on Windows 7; Win7 builds must use `build_win7.bat` with `requirements-win7.txt` (Pillow `<=9.5.0`)
+11. **Windows 7 requires Python 3.8.x only** — Python 3.9+ builds will not run on Windows 7; the single build uses `requirements.txt` (Pillow pinned `<=9.5.0`) and must be produced on Python 3.8.x
 
 
 ## Documentation Status
@@ -112,7 +112,7 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
-| 2026-09-27 | Docs/build config: Windows compatibility matrix + separate requirements + build scripts (no .py changes) | PM (Mo-Mo) request: document which Python supports which Windows; separate Win7/Win10 builds | docs/WINDOWS_COMPATIBILITY.md (new), requirements-win7.txt (new), requirements-win10.txt (new), build_win7.bat (new), build_win10.bat (new), README.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md | Verified: Python 3.8.10 on build machine; `git status` shows only docs/config files; pending commit + push |
+| 2026-09-23 | Simplified build: removed separate Win7/Win10 scripts, single build for all Windows | Boss decision | requirements.txt, docs/ | Pushed to GitHub |
 | 2026-09-23 | Docs: added MIT License + Clean Slate status to HANDOFF / ARCHITECTURE / DECISIONS (ADR-005) — no source-code changes | PM request: documentation must match reality (LICENSE, 49c344d, Release v2.0.0 pending) | docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/04_DECISIONS.md (+ docs/CURRENT_TASK.md, docs/CHANGELOG.md bookkeeping) | Committed in 78e6766 |
 
 | 2026-09-23 | GitHub Release v2.0.0 — PENDING owner manual publish (no tags in repo; `gh` CLI not installed) | Clean Slate code already on origin main; Release page not yet created | Tag `v2.0.0` (to be created) + Release notes in docs/CHANGELOG.md | `git tag --list` = empty; publish at https://github.com/pppoipoit/Key-Scraper/releases/new |
@@ -163,13 +163,12 @@ Pillow
 | Key_Scraper.exe | ~7.8 MB | dist/onedir/Key Scraper 2.0/ |
 | Key_Scraper_Setup.exe | ~29.3 MB | dist/installer/ |
 
-### Multi-version builds (added 2026-09-27)
-Separate builds per target Windows version (see `docs/WINDOWS_COMPATIBILITY.md`):
+### Single build — all Windows versions (updated 2026-09-27)
+ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
-| Target | Build Script | Requirements | Output |
-|--------|--------------|--------------|--------|
-| Windows 7/8 (Python 3.8 ONLY) | `build_win7.bat` | `requirements-win7.txt` (Pillow `<=9.5.0`) | `dist\Key_Scraper_Win7\` |
-| Windows 10/11 (Python 3.8+) | `build_win10.bat` | `requirements-win10.txt` | `dist\Key_Scraper_Win10\` |
+| Target | Build Command | Requirements | Output |
+|--------|---------------|--------------|--------|
+| Windows 7/8/10/11 (Python 3.8.x) | `python -m PyInstaller --noconsole --onedir --icon=icon.ico --name "Key_Scraper" main.py` | `requirements.txt` (Pillow `<=9.5.0`) | `dist\Key_Scraper\` |
 
 
 ## Architecture Decisions
@@ -207,7 +206,6 @@ Separate builds per target Windows version (see `docs/WINDOWS_COMPATIBILITY.md`)
 | Info | No automated tests | Every change requires manual testing | Write manual test steps (see PROJECT_COMMANDS.md) |
 | Info | No log file | Can't debug after app closes | User must screenshot or copy log before closing |
 | Info | Brand detection may misclassify | Wrong brand folder for unusual model names | Acceptable for now; owner can request improvement |
-| Info | Inno Setup script has hardcoded paths | Cannot compile installer on different machine without editing | Update paths in Create Installer.iss before compiling |
 | Info | No persistent settings | Must re-select folder each session | Acceptable for current use case |
 
 ---
@@ -272,7 +270,7 @@ Separate builds per target Windows version (see `docs/WINDOWS_COMPATIBILITY.md`)
 
 ## Last Updated
 
-2026-09-27 — TC-004: Windows compatibility matrix + multi-version build setup (docs/WINDOWS_COMPATIBILITY.md, requirements-win7.txt, requirements-win10.txt, build_win7.bat, build_win10.bat, README.md, HANDOFF.md, CHANGELOG.md, CURRENT_TASK.md) — docs/config only, no .py changes, pending commit + push to main
+2026-09-27 — TC-005: Simplify build — deleted build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt; single requirements.txt with Pillow<=9.5.0; updated docs/WINDOWS_COMPATIBILITY.md, README.md, HANDOFF.md, CHANGELOG.md, CURRENT_TASK.md — docs/config only, no .py changes, committed + pushed to main
 - **Environment**: Python 3.8.10 on build machine (Windows 7-compatible); requests/beautifulsoup4/Pillow not installed machine-wide
 - **License**: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) — root LICENSE, tracked in git
 - **GitHub Portfolio Setup**: COMPLETE (Clean Slate 49c344d pushed); Release v2.0.0 tag + page still pending owner manual publish

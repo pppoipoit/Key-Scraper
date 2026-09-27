@@ -2,58 +2,63 @@
 
 ## Task ID and title
 
-TC-004: Windows Compatibility Matrix + Multi-Version Build Setup
+TC-005: Simplify Build — Remove Separate Win7/Win10 Builds (Single Build for All Windows)
 
 ## Status
 
-**Completed** (2026-09-27) — docs/config only; committing + pushing next
+**Completed** (2026-09-27) — 4 build files deleted + docs/requirements updated; commit + push to main
 
 ## Goal
 
-Document exactly which Python version supports which Windows version, and provide separate build configurations (requirements + build scripts) for Windows 7/8 vs Windows 10/11 — without touching any source code.
+Simplify to ONE build approach: Python 3.8.10 supports Windows 7, 10, AND 11, so remove the separate Win7/Win10 build scripts and requirements files, pin Pillow in the single `requirements.txt`, and update all documentation to reflect the single-build approach — without touching any source code.
 
 ## Scope
 
-- docs/WINDOWS_COMPATIBILITY.md (new): Python/Windows matrix, library compatibility, build matrix
-- requirements-win7.txt (new): requests>=2.25.0,<3.0.0, beautifulsoup4>=4.9.0,<5.0.0, Pillow>=8.0.0,<=9.5.0
-- requirements-win10.txt (new): requests>=2.28.0, beautifulsoup4>=4.12.0, Pillow>=10.0.0
-- build_win7.bat (new) + build_win10.bat (new): PyInstaller build scripts per target
-- README.md: new "💻 Windows Compatibility" section
-- docs/HANDOFF.md: Project Snapshot note + Known Limitation #11 + Multi-version builds under Build Artifacts
-- docs/CHANGELOG.md: [Unreleased] Windows Compatibility Setup entry
+- Delete: `build_win7.bat`, `build_win10.bat`, `requirements-win7.txt`, `requirements-win10.txt`
+- `requirements.txt` (single file): requests, beautifulsoup4, Pillow<=9.5.0
+- docs/WINDOWS_COMPATIBILITY.md: replaced with simplified single-build version
+- README.md: "💻 Windows Compatibility" section replaced with single-build table + build command
+- docs/HANDOFF.md: removed separate-build mentions, removed Inno Setup hardcoded-paths Known Issue (already fixed), added Recent changes row
+- docs/CHANGELOG.md: [2.0.1] entry added
 - docs/CURRENT_TASK.md: this file
-- Commit + push with message: "📝 Docs: Add Windows compatibility matrix + multi-version build setup"
+- Commit + push with message: "🧹 Simplify: remove separate Win7/Win10 builds — single build for all Windows (Boss decision)"
 
 ## Non-goals
 
 - No .py changes (scraper_core.py, app.py, main.py, gradient_widgets.py, theme.py untouched)
 - No Korean folder-name or ADR-002 brand-logic changes
 - No threading model changes
-- No changes to original requirements.txt
 - No new dependencies
+- No changes to docs/04_DECISIONS.md (ADR numbering conflict flagged, see below)
 
 ## Acceptance criteria
 
-- [x] Environment checked: Python 3.8.10 (Win7-compatible — NO 3.9+ warning needed)
-- [x] docs/WINDOWS_COMPATIBILITY.md contains the compatibility matrix
-- [x] requirements-win7.txt and requirements-win10.txt created with specified pins
-- [x] build_win7.bat and build_win10.bat created
-- [x] README.md has Windows Compatibility section
-- [x] HANDOFF.md updated (Snapshot, Known Limitations, Build Artifacts)
-- [x] CHANGELOG.md has [Unreleased] entry
-- [ ] `git status` shows only docs/config files; commit + push to main succeeds
+- [x] build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt deleted
+- [x] requirements.txt = requests / beautifulsoup4 / Pillow<=9.5.0
+- [x] docs/WINDOWS_COMPATIBILITY.md replaced with single-build version
+- [x] README.md Windows Compatibility section replaced; no dangling build_win7/build_win10 references
+- [x] docs/HANDOFF.md free of "separate builds" mentions; Inno Setup hardcoded-paths Known Issue removed
+- [x] docs/CHANGELOG.md has [2.0.1] entry
+- [ ] `git status` shows only intended files; commit + push to main succeeds
+
+## Open items flagged (outside this task's scope)
+
+- docs/04_DECISIONS.md already uses ADR-005 for "MIT License & Clean Slate Portfolio", but the new docs/WINDOWS_COMPATIBILITY.md labels the single-build decision as ADR-005 — numbering conflict needs owner decision (e.g., renumber to ADR-006)
+- docs/CHANGELOG.md [Unreleased] entry dated 2026-09-27 still lists the deleted files under "Added" (stale)
+- docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, and HANDOFF "For Owner" item 4 still claim Create Installer.iss has hardcoded paths (verified fixed — stale docs)
 
 ## Environment check result (2026-09-27)
 
 - `python --version` → **Python 3.8.10** (Windows 7-compatible ✅ — no Win7 build warning required)
-- `pip list` → requests / beautifulsoup4 / Pillow **NOT installed** in machine environment; PyInstaller 6.22.3 present. Build scripts install deps via requirements files.
+- `pip list` → requests / beautifulsoup4 / Pillow **NOT installed** in machine environment; PyInstaller 6.22.3 present. Install deps via `pip install -r requirements.txt` before building.
 
 ## Work log
 
-- Read core docs (HANDOFF, CURRENT_TASK, DECISIONS, PROJECT_COMMANDS, README) per .clinerules/00-core-workflow
-- Created WINDOWS_COMPATIBILITY.md, requirements-win7.txt, requirements-win10.txt, build_win7.bat, build_win10.bat
-- Updated README.md, HANDOFF.md, CHANGELOG.md
-- Validated: git status shows only intended files; no .py modifications
+- Read core docs (HANDOFF, CURRENT_TASK, DECISIONS, PROJECT_COMMANDS) per .clinerules/00-core-workflow
+- Verified `Create Installer.iss` no longer contains hardcoded "Google Drive" paths (Inno Setup limitation truly fixed)
+- Deleted build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt (git rm)
+- Updated requirements.txt (Pillow<=9.5.0), docs/WINDOWS_COMPATIBILITY.md, README.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md
+- Validated: git status/diff shows only intended files; no .py modifications
 
 ---
 
