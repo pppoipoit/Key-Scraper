@@ -1,33 +1,83 @@
 # Changelog
 
-ใช้รูปแบบ:
+ประวัติการเปลี่ยนแปลงทั้งหมดของ LaptopKey Scraper - Elite Edition
+รูปแบบ: [Semantic Versioning](https://semver.org/lang/th/)
 
 ## [Unreleased]
 
-### Added
+### 🔧 Fixed
 
-- Retry mechanism for page fetching in `scraper_core.py` — `fetch_page()` now retries network timeouts, connection errors, and HTTP 5xx up to 3 times (2-second wait between attempts) using the same retry constants as image downloads. Without this, a single hiccup while loading a product page lost the *entire page* of images; now only that individual image is skipped. HTTP 4xx (404/403/401) still fails immediately because retrying cannot help, and the user-facing message stays exactly `"Cannot open web! Check your URL again, Boss!"`. `fetch_page()` remains a pure function — its signature and return value (`BeautifulSoup` or `None`) are unchanged (OQ-008 follow-up)
-- Retry mechanism for failed image downloads in `scraper_core.py` — network timeouts, connection errors, and HTTP 5xx are retried up to 3 times (2-second wait between attempts) inside the existing background worker thread. Permanent failures (e.g. HTTP 4xx) are logged and skipped without retry, as before (TC-002 / OQ-008)
-- Automated unit tests for the core logic in `tests/test_scraper_core.py` — 26 tests covering brand detection (ADR-002 compliance), Korean folder names, URL joining, and retry behaviour for both image downloads and page fetching. Run with `python -m unittest discover tests`; uses the standard-library `unittest` only and performs no network access (TC-002 / OQ-006)
+- **Windows 7 compatibility — exe rebuilt with Python 3.8.10.** The previously distributed build failed on Windows 7 with `api-ms-win-core-path-l1-1-0.dll is missing`. Root cause confirmed by static PE import analysis, not guessed: the old bundle shipped **`python313.dll`**, which imports `api-ms-win-core-path-l1-1-0.dll` — an API set Windows 7 does not provide. (The old bundle also shipped `cryptography\_rust.pyd`, importing `api-ms-win-core-synch-l1-2-0.dll` — a second Win7 blocker — plus `numpy` and `lxml`, none of which are in `requirements.txt`.)
+- **Rebuilt artifact:** `dist\Key_Scraper\Key_Scraper.exe` (2,599,618 bytes) built with Python **3.8.10** + PyInstaller 6.22.3. Bundles `python38.dll`; a scan of all 31 `.exe`/`.dll`/`.pyd` files in the bundle found **zero** post-Win7 API-set imports. Launch smoke test passed (GUI alive after 8s) and `python -m unittest discover tests` → `Ran 26 tests — OK`.
+- **PyInstaller 6.22.3 confirmed usable for Windows 7 targets.** Its "runs in Windows 8 and newer" note refers to the *build* machine, not the destination; the 6.22.3 Windows bootloader itself imports no post-Win7 API sets. No dependency downgrade was needed.
 
-### Changed
+### ⚠️ Deprecated
 
-### Fixed
+- **All pre-2026-09-28 build artifacts, including `dist\installer\Key_Scraper_Setup.exe`.** They are Python 3.13 builds and are **not** Windows 7 compatible. Only the freshly rebuilt `dist\Key_Scraper\` supports Windows 7.
 
-### Deprecated
+### 📖 Documentation
 
-### Removed
-
-### Security
+- `docs/WINDOWS_COMPATIBILITY.md`: added a critical warning box at the top — the build MUST use Python 3.8.x; added the 5-second `_internal\python38.dll` vs `python313.dll` check, the verified-build record, and the evidence table for the old failure.
+- `docs/HANDOFF.md`: Known Limitations rows 12 and 13 record that old dist artifacts are 3.9+ (actually 3.13) builds and that Win7 support is statically verified only.
+- No `.py` source files were modified in this task; no Korean folder names or ADR-002 logic touched.
 
 ---
 
-## [Unreleased] - Windows Compatibility Setup - 2026-09-27
+## [2.1.0] - 2026-09-27
 
-### Added
+### 🎉 Production Ready Release
 
-- Windows compatibility matrix documentation (`docs/WINDOWS_COMPATIBILITY.md`)
-- Updated README with compatibility information
+This release marks the project as **Production Ready** with comprehensive resilience and testing.
+
+#### Added
+- **Retry Mechanism (2 layers):**
+  - Page-level retry: `fetch_page()` now retries up to 3 times on network failures and HTTP 5xx errors
+  - Image-level retry: `download_image()` retries up to 3 times on download failures
+  - Smart retry: Fails immediately on HTTP 4xx (no point retrying client errors)
+  - 2-second delay between retry attempts (`DOWNLOAD_RETRY_DELAY_SECONDS = 2`, `DOWNLOAD_MAX_RETRIES = 3` — one shared constant pair for both layers)
+- **Automated Test Suite (26 tests):**
+  - Full test coverage for brand detection logic (ADR-002 compliance)
+  - Test coverage for retry mechanisms (both page and image level)
+  - Test coverage for Korean folder names preservation
+  - All tests run offline in <0.1s using `unittest` (no external dependencies)
+  - Run command: `python -m unittest discover tests`
+  - Verified: `Ran 26 tests in 0.087s — OK` (Python 3.8.10, all HTTP calls mocked)
+- **GitHub Portfolio Setup:**
+  - Clean Slate operation: Removed all build artifacts and local paths from git history
+  - MIT License (Copyright 2026 pppoipoit x DRKMTTR Studio)
+  - Professional README.md with tech stack and features
+  - Comprehensive documentation (22 files in `docs/` including 5 owner manuals, plus 6 workflow guides and 7 rule files in `.clinerules/`)
+- **Windows Compatibility:**
+  - Single build supports Windows 7, 10, and 11
+  - Python 3.8.x requirement documented
+  - Pillow<=9.5.0 pinned for Windows 7 compatibility
+
+#### Changed
+- Simplified build: Removed separate Win7/Win10 scripts (`build_win7.bat`, `build_win10.bat`, `requirements-win7.txt`, `requirements-win10.txt`), unified to a single build approach
+- Documentation truth: Stale claims about hardcoded local paths removed from `docs/PROJECT_COMMANDS.md`, `docs/REPOSITORY_AUDIT.md`, `docs/HANDOFF.md`, `docs/02_ARCHITECTURE.md`
+- ADR-005: MIT License & Clean Slate Portfolio (Accepted)
+- ADR-006: Single Build for All Windows Versions (Accepted)
+
+#### Fixed
+- Documentation claimed `Create Installer.iss` used hardcoded local paths — it actually uses clean relative paths (`dist\installer`, `dist\onedir\Key Scraper 2.0\*`); the false warnings were removed
+- Thread-safety bug (fixed in the original code before v2.0.0, now formally recorded in `docs/02_ARCHITECTURE.md` and `docs/HANDOFF.md`)
+
+#### Technical Details
+- 26 automated tests covering core logic
+- Retry logic isolated to background worker threads (UI never freezes)
+- All ADR-002 rules enforced by automated tests
+- Zero UI changes — `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched since the v2.0.0 clean slate (verified via `git diff 49c344d..HEAD`)
+
+#### Known Limitations Carried Into This Release
+These are pre-existing and remain open — they are not regressions from v2.1.0:
+- `ISSUE-001` (`docs/KNOWN_ISSUES.md`): `main.py` uses `os.path.dirname(os.path.abspath(__file__))` instead of a `get_base_path()` / `sys._MEIPASS` check, so the window icon may not resolve when running from a PyInstaller bundle
+- `ISSUE-002` (`docs/KNOWN_ISSUES.md`): `app.py` still uses `left_w, right_w = 300, 590` (log panel wider than URL panel) rather than the `590, 300` layout described in the audit
+- `ISSUE-003`: both `icon.ico` and `Logo_BK.ico` are present; `Logo_BK.ico` is unreferenced
+- UI and threading behaviour are still verified manually — no automated coverage
+
+---
+
+**Previous release**: [2.0.1] - 2026-09-27 (single-build simplification) · [2.0.0] - 2026-09-23 (Clean Slate / portfolio-ready, commit `49c344d`)
 
 ---
 
@@ -82,8 +132,10 @@
 
 ---
 
-หมายเหตุ: เวอร์ชันนี้ยังไม่มี Git tags หรือ release notes อย่างเป็นทางการ
-หากมีการ release จริง ควรสร้าง Git tag และอัปเดตส่วนนี้
+หมายเหตุ (แก้ไข 2026-09-27): ข้อความเดิมในไฟล์นี้ระบุว่า "ยังไม่มี Git tags" — **ไม่จริงแล้ว**
+ตรวจสอบด้วย `git tag --list` และ `git ls-remote --tags origin` เมื่อ 2026-09-27 พบว่า tag `v2.0.0` มีอยู่จริง
+และถูก push ไปที่ origin แล้ว (ชี้ไปที่ commit `b2288c6`) ส่วน GitHub CLI (`gh`) **มีติดตั้งอยู่** ที่
+`C:\Program Files\GitHub CLI\gh.exe` — ข้อความเดิมที่ระบุว่าไม่ได้ติดตั้งจึงไม่ถูกต้อง
 
 ---
 
@@ -92,8 +144,8 @@
 **Fact**: Single root-commit history force-pushed to `origin main` (https://github.com/pppoipoit/Key-Scraper.git).
 No source-code changes in this release — docs bookkeeping only (CURRENT_TASK, HANDOFF, CHANGELOG).
 
-**Release status**: GitHub Release v2.0.0 NOT yet published (gh CLI not installed on this machine).
-Owner action required — publish at https://github.com/pppoipoit/Key-Scraper/releases/new with tag `v2.0.0`.
+**Release status (verified 2026-09-27)**: tag `v2.0.0` **exists and is pushed to origin** (`git ls-remote --tags origin` → `b2288c6 refs/tags/v2.0.0`).
+Whether a GitHub *Release page* (as opposed to the tag) has been published was **not verifiable** from this machine — `gh` is installed but no authenticated check was run in this task. Confirm at https://github.com/pppoipoit/Key-Scraper/releases
 
 **Release notes for owner to paste** (title: ✨ Elite Edition v2.0.0 — Clean Slate & Portfolio Ready):
 

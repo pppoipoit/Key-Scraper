@@ -1,7 +1,7 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-27 — TC-002 follow-up: retry mechanism extended to page fetching (`fetch_page()`) for full resilience at both page and image level + 7 new unit tests (26 total) — commit + push to main
-**Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
+**Last updated**: 2026-09-27 — v2.1.0 "Production Ready" release prepared (CHANGELOG + RELEASE notes finalized). Documentation-only task; no `.py` changes.
+**Status**: **Production Ready — Project Closed** (per Boss decision 2026-09-27). All planned work complete: retry mechanism (2 layers) + 26 passing automated tests + GitHub portfolio setup.
 **Owner**: DRKMTTR Studio (Tokenmee)
 
 ---
@@ -54,7 +54,7 @@ Pillow
 - Image downloads saved to structured folders
 - **Retry on failed downloads (TC-002)**: network errors (timeout/connection) and HTTP 5xx are retried up to 3 times with a 2-second wait, running inside the background worker thread only; permanent failures (e.g. HTTP 4xx) are logged and skipped
 - **Retry on failed page fetches (TC-002 follow-up)**: `fetch_page()` uses the same retry rules and the same constants (`DOWNLOAD_MAX_RETRIES` / `DOWNLOAD_RETRY_DELAY_SECONDS`) as image downloads, so a temporary network glitch while loading a product page no longer discards the whole page of images — only that one URL is skipped. HTTP 4xx still fails immediately. The function is still pure and still returns `BeautifulSoup` or `None`; the user-facing message `"Cannot open web! Check your URL again, Boss!"` is unchanged. Note: a permanently unreachable URL now takes about 6 seconds longer to report the failure (3 × 2s waits) before the same message appears.
-- **Automated unit tests for core logic (TC-002)**: 26 tests in `tests/test_scraper_core.py` covering brand detection (ADR-002), Korean folder names, URL joining, row filtering and retry behaviour for both image downloads and page fetching — run with `python -m unittest discover tests` (no network needed, no new dependencies)
+- **Automated unit tests for core logic (TC-002)**: 26 tests in `tests/test_scraper_core.py` covering brand detection (ADR-002), Korean folder names, URL joining, row filtering and retry behaviour for both image downloads and page fetching — run with `python -m unittest discover tests` (no network needed, no new dependencies). **Last verified 2026-09-27: `Ran 26 tests in 0.087s — OK`**
 - Thread-safe UI updates via `root.after()`
 - Custom gradient/rounded widgets (PIL-rendered)
 - Build system produces `Key_Scraper.exe` and `Key_Scraper_Setup.exe`
@@ -69,11 +69,16 @@ Pillow
 - **Clean Slate Git Push COMPLETE (2026-09-23)**: Single root commit 49c344d force-pushed to origin main (https://github.com/pppoipoit/Key-Scraper.git), working tree clean.
 - **MIT License COMPLETE**: Root `LICENSE` present — MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio), tracked in git.
 - **Portfolio hygiene COMPLETE**: Root `.gitignore` present and tracked — excludes `dist/`, `build/`, `*.exe`, Python cache, IDE/OS junk. No build artifacts committed after clean slate.
+- **Git tag `v2.0.0` EXISTS and is on origin** (corrected 2026-09-27): verified via `git ls-remote --tags origin` → `b2288c6 refs/tags/v2.0.0`. Earlier docs in this project claimed "no tags in repo" — that was wrong. Whether a GitHub *Release page* exists was not verified in this task.
 
 ### ❌ Not Started
 - Automated test suite for the UI / threading model (unit tests cover the core logic only)
-- Product context documentation completion (awaiting owner input on open questions)
 - Any feature enhancements beyond documentation
+- **Open items carried into project close** (pre-existing, from `docs/KNOWN_ISSUES.md`, verified still present in code 2026-09-27):
+  - `ISSUE-001` — `main.py` uses `os.path.dirname(os.path.abspath(__file__))`, not a `get_base_path()` / `sys._MEIPASS` check → window icon may not resolve in a PyInstaller bundle
+  - `ISSUE-002` — `app.py` still uses `left_w, right_w = 300, 590` instead of the `590, 300` layout described in the audit
+  - `ISSUE-003` — both `icon.ico` and `Logo_BK.ico` present; `Logo_BK.ico` is unreferenced
+  - `Create Installer.iss` still declares `AppVersion=2.0.0` (not bumped to 2.1.0)
 
 ### Known Limitations — Verified from Code
 1. **Automated tests cover core logic only** — brand detection, folder structure, URL joining and retry are tested (`tests/test_scraper_core.py`); the UI and threading model are still tested manually
@@ -87,6 +92,8 @@ Pillow
 9. **No log file** — logs are in-memory only, lost on close
 10. **No persistent config** — folder path not saved between sessions
 11. **Windows 7 requires Python 3.8.x only** — Python 3.9+ builds will not run on Windows 7; the single build uses `requirements.txt` (Pillow pinned `<=9.5.0`) and must be produced on Python 3.8.x
+12. **⚠️ OLD `dist/` ARTIFACTS ARE NOT WINDOWS 7 COMPATIBLE (verified 2026-09-28)** — the previously shipped artifacts (`dist\onedir\Key Scraper 2.0\` and `dist\installer\Key_Scraper_Setup.exe`) are **Python 3.13** builds, not 3.8. Static scan found `python313.dll` importing `api-ms-win-core-path-l1-1-0.dll` (the exact error reported by the owner) plus `cryptography\_rust.pyd` importing `api-ms-win-core-synch-l1-2-0.dll`. **Only the freshly rebuilt `dist\Key_Scraper\` (Python 3.8.10, bundles `python38.dll`, zero post-Win7 API-set imports) supports Windows 7.** Treat any pre-2026-09-28 build — including `Key_Scraper_Setup.exe` — as **not** for Windows 7. See `docs/WINDOWS_COMPATIBILITY.md`.
+13. **Win7 compatibility is statically verified only** — the rebuild was confirmed by PE import analysis, a launch smoke test on this Windows 10 machine, and `Ran 26 tests — OK`. It has **not** been run on a real Windows 7 PC; that final confirmation is the owner's manual step.
 
 
 ## Documentation Status

@@ -2,9 +2,27 @@
 
 ## Task ID and title
 
-TC-002 (follow-up) — Extend Retry Mechanism to `fetch_page()` in scraper_core.py
+TC-006 — Rebuild distributable exe with Python 3.8 for Windows 7 compatibility
 
 ## Status
+
+**Completed** (2026-09-28) — exe rebuilt with Python 3.8.10 into `dist\Key_Scraper\`, root cause of the Windows 7 failure confirmed by static PE import analysis, docs updated (WINDOWS_COMPATIBILITY / HANDOFF / CHANGELOG), committed + pushed to main.
+
+**Repository state**: no `.py` file was modified. The previously distributed artifact was a **Python 3.13** build (`python313.dll` imports `api-ms-win-core-path-l1-1-0.dll` — the exact error the owner reported on Windows 7). The fresh build bundles `python38.dll` and imports **zero** post-Win7 API sets across all 31 bundled binaries. Korean folder names and ADR-002 logic untouched.
+
+**Validation actually run**: `python -m unittest discover tests` → `Ran 26 tests — OK` · launch smoke test → GUI alive after 8s · `python --version` → 3.8.10 · build log header `Python: 3.8.10`.
+
+**Remaining manual step (owner)**: copy `dist\Key_Scraper\` to the Windows 7 PC and run it once. No physical Windows 7 machine was available for testing.
+
+**Next task**: none queued — owner picks the next item (OQ-007 still needs owner input; see `docs/OPEN_QUESTIONS.md` and `docs/05_BACKLOG.md`).
+
+---
+
+## Previous task
+
+TC-002 (follow-up) — Extend Retry Mechanism to `fetch_page()` in scraper_core.py
+
+### Status
 
 **Completed** (2026-09-27) — retry now covers image downloads **and** page fetching, 26 unit tests passing (`python -m unittest discover tests`), docs updated, committed + pushed to main.
 
