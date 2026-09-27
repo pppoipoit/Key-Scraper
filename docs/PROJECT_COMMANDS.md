@@ -22,7 +22,7 @@ pip list
 **Expected packages** (from requirements.txt — verified on disk):
 - requests
 - beautifulsoup4
-- Pillow
+- Pillow<=9.5.0
 
 ---
 
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 ```
 requests
 beautifulsoup4
-Pillow
+Pillow<=9.5.0
 ```
 
 ---

@@ -6,7 +6,7 @@
 
 ## Status
 
-**✅ CLOSED (2026-09-28)** — v2.1.0 shipped. Windows 7 compatibility **owner-verified**: the Python 3.8.10 rebuild was run on a real Windows 7 PC and launched without the `api-ms-win-core-path-l1-1-0.dll` error. The rebuilt installer (11,365,375 bytes) packages that same build. Docs updated, committed + pushed to main. **No further tasks are open.**
+**✅ Project CLOSED — v2.1.0 released publicly on GitHub** (2026-09-28). Published via `gh release create v2.1.0`: https://github.com/pppoipoit/Key-Scraper/releases/tag/v2.1.0 — Windows 7 compatibility **owner-verified**: the Python 3.8.10 rebuild was run on a real Windows 7 PC and launched without the `api-ms-win-core-path-l1-1-0.dll` error. The rebuilt installer (11,365,375 bytes) packages that same build and is attached to the release. Docs updated, committed + pushed to main. **No further tasks are open.**
 
 **Repository state**: no `.py` file was ever modified in the Win7 work. The old artifact was a **Python 3.13** build (`python313.dll` imports `api-ms-win-core-path-l1-1-0.dll` — the exact error the owner hit). The fresh build bundles `python38.dll` with zero post-Win7 API-set imports across all 31 bundled binaries. Korean folder names and ADR-002 logic untouched. `Create Installer.iss` line 28 repointed from the 3.13 build to the 3.8 build so the installer can never silently repackage a broken build.
 

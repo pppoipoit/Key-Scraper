@@ -9,6 +9,8 @@
 
 This release marks the project as **Production Ready**, **closed**, and **verified working on Windows 7** by the owner on 2026-09-28.
 
+- **Release published publicly via gh CLI with attached Windows 7-verified installer** (11,365,375 bytes).
+
 #### 🔧 Fixed — Windows 7 compatibility (owner-verified)
 - **The distributed exe was rebuilt with Python 3.8.10.** The previously distributed build failed on Windows 7 with `api-ms-win-core-path-l1-1-0.dll is missing`. Root cause confirmed by static PE import analysis, not guessed: the old bundle shipped **`python313.dll`**, which imports `api-ms-win-core-path-l1-1-0.dll` — an API set Windows 7 does not provide. (The old bundle also shipped `cryptography\_rust.pyd`, importing `api-ms-win-core-synch-l1-2-0.dll` — a second Win7 blocker — plus `numpy` and `lxml`, none of which are in `requirements.txt`.)
 - **Rebuilt artifact:** `dist\Key_Scraper\Key_Scraper.exe` (2,599,618 bytes) built with Python **3.8.10** + PyInstaller 6.22.3. Bundles `python38.dll`; a scan of all 31 `.exe`/`.dll`/`.pyd` files found **zero** post-Win7 API-set imports. `python -m unittest discover tests` → `Ran 26 tests — OK`.

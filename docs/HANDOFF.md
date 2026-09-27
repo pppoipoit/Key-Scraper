@@ -1,6 +1,6 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-28 — v2.1.0 "Production Ready" **owner-verified on Windows 7**; project closed. Documentation-only task; no `.py` changes.
+**Last updated**: 2026-09-28 — v2.1.0 published publicly on GitHub Releases with the Windows 7-verified installer attached. Documentation-only task; no `.py` changes.
 **Status**: **Production Ready — Project Closed (v2.1.0)** (per Boss decision 2026-09-27, Win7 verification confirmed 2026-09-28). All planned work complete: retry mechanism (2 layers) + 26 passing automated tests + Windows 7 rebuild verified by the owner + GitHub portfolio setup.
 **Owner**: DRKMTTR Studio (Tokenmee)
 
@@ -29,7 +29,7 @@
 ```
 requests
 beautifulsoup4
-Pillow
+Pillow<=9.5.0
 ```
 
 ### License — verified from root LICENSE file
@@ -123,6 +123,7 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
+| 2026-09-28 | v2.1.0 published via gh CLI with Win7-verified installer | Boss decision | RELEASE_v2.1.0.md, GitHub Releases | https://github.com/pppoipoit/Key-Scraper/releases/tag/v2.1.0 |
 | 2026-09-28 | **Win7 verification passed by owner** — the exe rebuilt with Python 3.8.10 was copied to a real Windows 7 PC and ran **without** the `api-ms-win-core-path-l1-1-0.dll` error. Root cause of the earlier failure was the old Python 3.13 artifact (`python313.dll` imports that API set). Documentation updated to state the build MUST use Python 3.8.x. | Boss reported the Windows 7 test passed; PM opened the release gate for v2.1.0 | `Create Installer.iss` (line 28 repointed from the 3.13 build to the 3.8 build), docs/WINDOWS_COMPATIBILITY.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/OPEN_QUESTIONS.md, docs/CURRENT_TASK.md | **Owner-verified** on Windows 7. Before the owner test: `Ran 26 tests — OK`; static PE import scan of all 31 bundled binaries found zero post-Win7 API sets; silent install to a temp dir + launch smoke test passed. Build output stays in `dist/` (local only, gitignored) |
 | 2026-09-27 | TC-002 follow-up: retry logic added to `fetch_page()` (3 retries, 2s wait, network errors + HTTP 5xx) so a temporary network glitch no longer loses an entire page of images; 7 new unit tests added for page-fetch retry (26 total). Reused the existing `DOWNLOAD_MAX_RETRIES` / `DOWNLOAD_RETRY_DELAY_SECONDS` constants; `fetch_page()` signature and return value unchanged | Boss approved adding retry to `fetch_page()` for page-level resilience; OQ-008 now covers both image downloads and page fetching | scraper_core.py (`fetch_page()` only), tests/test_scraper_core.py, docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 26 tests OK (0.038s, offline); HTTP 4xx verified to fail immediately with no retry; no tkinter/threading/brand-folder changes |
 | 2026-09-27 | TC-002: Retry mechanism for image downloads (3 retries, 2s wait, network errors + HTTP 5xx) + 19 automated unit tests for core logic; OQ-006 and OQ-008 marked Implemented | PM (Mo-Mo) + Boss approved TC-002; answers to OQ-006 (tests = YES) and OQ-008 (retry = YES) | scraper_core.py, tests/test_scraper_core.py (new), docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 19 tests OK; no tkinter/threading changes; brand mapping unchanged (asserted by tests) |
