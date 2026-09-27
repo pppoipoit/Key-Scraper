@@ -2,49 +2,55 @@
 
 ## Task ID and title
 
-TC-002 — Implement Retry Mechanism & Automated Tests for scraper_core.py
+TC-002 (follow-up) — Extend Retry Mechanism to `fetch_page()` in scraper_core.py
 
 ## Status
 
-**Completed** (2026-09-27) — retry implemented in `download_image()`, 19 unit tests added and passing (`python -m unittest discover tests`), docs updated, committed + pushed to main.
+**Completed** (2026-09-27) — retry now covers image downloads **and** page fetching, 26 unit tests passing (`python -m unittest discover tests`), docs updated, committed + pushed to main.
 
-**Repository state**: core scraping logic now retries transient download failures, and the pure core logic has automated test coverage. `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched (PM constraint).
+**Repository state**: core scraping logic retries transient failures at both levels, and the pure core logic has automated test coverage. `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched (PM constraint).
 
 **Next task**: none queued — owner picks the next item (OQ-007 still needs owner input; see `docs/OPEN_QUESTIONS.md` and `docs/05_BACKLOG.md`).
 
 ## Goal
 
-Answer OQ-006 (automated tests) and OQ-008 (retry logic): make image downloads resilient to transient network / HTTP 5xx failures, and add a dependency-free `unittest` suite covering the pure logic in `scraper_core.py`.
+Complete OQ-008 so that resilience is comprehensive: a temporary network problem while loading a product page must not cost the user the *entire page* of images. Previously only individual image downloads were retried — a hiccup during the initial page load skipped the whole URL.
 
 ## Scope
 
-- `scraper_core.py`: added `DOWNLOAD_MAX_RETRIES = 3`, `DOWNLOAD_RETRY_DELAY_SECONDS = 2` and wrapped the download body of `download_image()` in a retry loop
-  - Retries on `requests.exceptions.RequestException` (timeout / connection error) and HTTP 5xx
+- `scraper_core.py`: `fetch_page()` body wrapped in a retry loop reusing `DOWNLOAD_MAX_RETRIES = 3` and `DOWNLOAD_RETRY_DELAY_SECONDS = 2` (same constants as `download_image()`)
+  - Retries on `requests.exceptions.RequestException` (timeout / connection / DNS) and HTTP 5xx
   - HTTP 4xx and non-request exceptions fail immediately (retry cannot help)
   - `time.sleep()` inside the function is safe: the function only ever runs inside a `ThreadPoolExecutor` worker thread (`app.py` → `process_scraping`)
-- New `tests/test_scraper_core.py`: 19 tests, stdlib `unittest` + `unittest.mock` only (no new dependencies)
-  - covers brand detection (ADR-002), Korean folder names, URL joining, `head_row` filtering, retry behaviour
-  - `requests.get` and `time.sleep` are mocked → tests run offline in ~0.02s
-- docs: `OPEN_QUESTIONS.md` (OQ-006 / OQ-008 → Implemented), `HANDOFF.md`, `CHANGELOG.md`, `CURRENT_TASK.md`, `PROJECT_COMMANDS.md`, `QA_CHECKLIST.md`
+  - **Signature and return value unchanged** — still `(url, log_callback=None)` → `BeautifulSoup` or `None`; still a pure function with no UI dependency
+  - User-facing message `"Cannot open web! Check your URL again, Boss!"` preserved
+- `tests/test_scraper_core.py`: +7 tests (`TestFetchPageRetry`), 26 total, stdlib `unittest` + `unittest.mock` only (no new dependencies)
+  - `requests.get` and `time.sleep` are mocked → tests run offline in ~0.04s
+  - 4xx/5xx are simulated the way `requests` really behaves: the mock's `raise_for_status()` raises a real `requests.exceptions.HTTPError`
+- docs: `OPEN_QUESTIONS.md` (OQ-008 now covers both page fetching and image downloads), `HANDOFF.md`, `CHANGELOG.md`, `CURRENT_TASK.md`, `PROJECT_COMMANDS.md`, `QA_CHECKLIST.md`
 
 ## Non-goals
 
 - No changes to `app.py`, `main.py`, `gradient_widgets.py`, `theme.py`
 - No changes to brand detection logic or Korean folder names (ADR-002)
+- No changes to the position-based image download logic (`img[0]` = regular, `img[1]` = larger, `img[2]` = smaller — locked)
 - No threading model changes; no tkinter import and no `root.after()` in `scraper_core.py` or `tests/`
 - No new dependencies (stdlib `unittest` only)
-- No retry added to `fetch_page()` — a page fetch failure still fails that URL as before (out of scope, would change user-visible behavior)
+- No new retry constants, no helper class, no refactor of other functions — the retry logic is isolated inside `fetch_page()`
+- No change to `fetch_page()`'s signature or return type
 
 ## Acceptance criteria
 
-- [x] `download_image()` retries up to 3 times (4 attempts total) with a 2-second wait on network errors and HTTP 5xx
-- [x] Permanent failures logged as `Error downloading: <filename> | <reason>` and the function returns `False`
-- [x] No tkinter / `root.after()` introduced; retry stays isolated in the background worker thread
-- [x] `tests/test_scraper_core.py` created with stdlib `unittest`, no network access
-- [x] Brand mapping covered by tests (AC→Acer, AS→ASUS, MS→MSI, SG→SAMSUNG, D→DELL, H→HP, L→Lenovo, T→TOSHIBA, A→Apple, unknown→Others)
-- [x] URL joining logic covered by tests
-- [x] `python -m unittest discover tests` passes
-- [x] OQ-006 and OQ-008 status set to Implemented in `docs/OPEN_QUESTIONS.md`
+- [x] `fetch_page()` retries up to 3 times (4 attempts total) with a 2-second wait on network errors and HTTP 5xx
+- [x] HTTP 4xx (404 / 403 / 401) fails immediately with no retry and no sleep
+- [x] Non-network errors fail immediately with no retry
+- [x] Each retry is logged clearly as `Retry <n>/3 for <url> in 2s | <reason>`
+- [x] After all retries are exhausted, `fetch_page()` returns `None` (does not raise), and the caller `process_single_url()` skips the URL as before
+- [x] `fetch_page()` signature and return value unchanged (`BeautifulSoup` or `None`) — still pure
+- [x] `download_image()` retry behaviour unchanged (19 pre-existing tests still pass)
+- [x] `tests/test_scraper_core.py` extended with page-fetch retry tests; all HTTP calls mocked
+- [x] `python -m unittest discover tests` passes (26 tests, offline)
+- [x] OQ-008 notes that retry covers BOTH image downloads and page fetching
 - [x] `docs/HANDOFF.md` (Current Product State + Recent changes) and `docs/CHANGELOG.md` ([Unreleased]) updated
 - [x] Commit + push to `main` succeeds
 
@@ -59,14 +65,15 @@ Answer OQ-006 (automated tests) and OQ-008 (retry logic): make image downloads r
 
 ## Validation results (2026-09-27)
 
-- `python -m unittest discover tests -v` → **Ran 19 tests ... OK** (0.023s, offline)
+- `python -m unittest discover tests -v` → **Ran 26 tests ... OK** (0.031s, offline) — 19 pre-existing + 7 new page-fetch retry tests
 - `python -c "import scraper_core"` → OK (Python 3.8.10; deps installed with the documented `pip install -r requirements.txt`)
+- Signature check → `fetch_page(url, log_callback=None)` unchanged; returns `BeautifulSoup` or `None`
 - Lint / typecheck → **Not run** — none configured in this repository (see `docs/PROJECT_COMMANDS.md`)
 - Manual UI test → **Not run in this session** — the retry runs in the background worker thread and changes no UI element; a manual re-check is suggested (steps in `docs/PROJECT_COMMANDS.md`)
 
 ## Owner approval
 
-**Approved** — PM (Mo-Mo) and Boss approved TC-002 (retry + automated tests) on 2026-09-27.
+**Approved** — PM (Mo-Mo) and Boss approved TC-002 (retry + automated tests) on 2026-09-27, and Boss approved extending the retry to `fetch_page()` on 2026-09-27.
 
 ## Environment check result (2026-09-27)
 
@@ -75,12 +82,25 @@ Answer OQ-006 (automated tests) and OQ-008 (retry logic): make image downloads r
 
 ## Work log
 
+### TC-002 (original — retry for image downloads)
+
 - Read core docs (HANDOFF, CURRENT_TASK, DECISIONS, PROJECT_COMMANDS, QA_CHECKLIST, OPEN_QUESTIONS) per `.clinerules/00-core-workflow.md`
 - Verified `download_image()` only ever runs inside the `ThreadPoolExecutor` worker (`app.py` → `process_scraping`), so `time.sleep()` cannot block the UI
 - Added retry constants + retry loop to `download_image()` in `scraper_core.py` (only `.py` file touched)
 - Created `tests/test_scraper_core.py` (19 tests, stdlib `unittest`, all HTTP mocked) — all pass
 - Updated docs: `OPEN_QUESTIONS.md` (OQ-006 / OQ-008 → Implemented), `HANDOFF.md`, `CHANGELOG.md`, `CURRENT_TASK.md`, `PROJECT_COMMANDS.md`, `QA_CHECKLIST.md`
 - Constraint check: `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched; no tkinter import / `root.after()` in `scraper_core.py` or `tests/`; brand mapping and Korean folder names unchanged (asserted by the tests)
+
+### TC-002 follow-up (retry for page fetching)
+
+- Verified `fetch_page()` is called only from `process_single_url()`, which runs inside the `ThreadPoolExecutor` worker — so `time.sleep()` is safe there too
+- Wrapped the `fetch_page()` body in a retry loop reusing the **existing** `DOWNLOAD_MAX_RETRIES` / `DOWNLOAD_RETRY_DELAY_SECONDS` (no new constants, no helper class, no refactor of other functions)
+- Key detail: `requests.exceptions.HTTPError` is a subclass of `RequestException`, so the `except HTTPError` clause must come **first** to distinguish 4xx (no retry) from 5xx (retry)
+- Simulated HTTP error statuses in tests the way `requests` really behaves — the mock's `raise_for_status()` raises a real `HTTPError` carrying the response; a plain `Mock` with `status_code = 500` would never trigger the retry path
+- Added `TestFetchPageRetry` (7 tests) to `tests/test_scraper_core.py` — all 26 pass
+- Noted the deliberate behavior change: a permanently dead URL now takes ~6s longer to report failure (3 × 2s waits) before showing the same message
+- Updated docs: `OPEN_QUESTIONS.md` (OQ-008 now covers page fetching), `HANDOFF.md`, `CHANGELOG.md`, `CURRENT_TASK.md`, `PROJECT_COMMANDS.md`, `QA_CHECKLIST.md`
+- Constraint check: `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched; `img[0]/img[1]/img[2]` positions untouched; `get_brand_name()` and Korean folder names untouched; `fetch_page()` signature unchanged
 
 ---
 

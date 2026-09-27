@@ -10,13 +10,13 @@
 | OQ-005 | ต้องการให้รองรับ macOS หรือ Linux หรือไม่? | ปัจจุบัน icon.ico และ installer ออกแบบมาสำหรับ Windows | main.py, Create Installer.iss | No | NO | Open |
 | OQ-006 | ต้องการให้เพิ่ม automated test หรือไม่? | ✅ ตอนนี้มี unit test แล้วที่ tests/test_scraper_core.py (รัน: python -m unittest discover tests) | tests/, QA_CHECKLIST.md | No | YES | Implemented |
 | OQ-007 | ต้องการให้จัดเก็บรูปตามชื่อแบรนด์แบบอื่นหรือไม่? | ปัจจุบันใช้ prefix ของชื่อโมเดล (เช่น ACxxx → Acer) | scraper_core.py | No | [NEEDS OWNER INPUT] | Open |
-| OQ-008 | ต้องการให้ retry เมื่อดาวน์โหลดรูปไม่สำเร็จหรือไม่? | ✅ ตอนนี้ retry อัตโนมัติแล้ว (3 ครั้ง ห่างกัน 2 วินาที) เมื่อเจอ network error หรือ HTTP 5xx | scraper_core.py | No | YES | Implemented |
+| OQ-008 | ต้องการให้ retry เมื่อดาวน์โหลดรูปไม่สำเร็จหรือไม่? | ✅ ตอนนี้ retry อัตโนมัติแล้ว (3 ครั้ง ห่างกัน 2 วินาที) เมื่อเจอ network error หรือ HTTP 5xx — ครอบคลุมทั้ง **การดาวน์โหลดรูป (`download_image()`)** และ **การโหลดหน้าเว็บ (`fetch_page()`)** | scraper_core.py | No | YES | Implemented |
 
 ---
 
 ## Status Definitions
 
-- **Implemented**: ทำเสร็จแล้วและตรวจสอบผ่าน (ปิดคำถามนี้) เช่น OQ-006 (มี unit test) และ OQ-008 (มี retry) — ทำใน TC-002 เมื่อ 2026-09-27
+- **Implemented**: ทำเสร็จแล้วและตรวจสอบผ่าน (ปิดคำถามนี้) เช่น OQ-006 (มี unit test) และ OQ-008 (มี retry ทั้งระดับดาวน์โหลดรูปและระดับโหลดหน้าเว็บ) — ทำใน TC-002 เมื่อ 2026-09-27
 - **Open**: ยังไม่มีคำตอบ ต้องถามเจ้าของ
 - **Answered**: มีคำตอบแล้ว (ให้กรอกใน Owner answer)
 - **Deferred**: เลื่อนไปก่อน ยังไม่ต้องตัดสินใจ

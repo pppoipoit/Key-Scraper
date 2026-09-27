@@ -10,7 +10,7 @@
 - [x] Permission/role behavior ถูกต้อง (N/A — ไม่มี auth)
 - [ ] Input validation ถูกต้อง (ตรวจว่ามี URL และ folder ก่อนเริ่ม)
 - [ ] ไม่มี secret หรือข้อมูลส่วนตัวใน code/log/docs (ตรวจแล้ว)
-- [x] Test/lint/typecheck/build รันแล้ว หรืออธิบายว่าทำไมรันไม่ได้ (automated: `python -m unittest discover tests` → 19 tests OK เมื่อ 2026-09-27 / ไม่มี linter และ type checker ในโปรเจกต์นี้)
+- [x] Test/lint/typecheck/build รันแล้ว หรืออธิบายว่าทำไมรันไม่ได้ (automated: `python -m unittest discover tests` → 26 tests OK เมื่อ 2026-09-27 / ไม่มี linter และ type checker ในโปรเจกต์นี้)
 - [x] Manual test steps ถูกเขียนให้ non-developer ทำตามได้ (ดูส่วนท้ายของไฟล์นี้)
 - [ ] Documentation/Handoff ถูกอัปเดต (กำลังทำ)
 - [x] ไม่มี change นอก scope โดยไม่อนุมัติ
@@ -51,6 +51,7 @@
 1. ใส่ URL ที่ผิดหรือเปล่า:
    - ถ้าช่องว่าง → ควรขึ้น warning "No URL?"
    - ถ้าใส่ URL ไม่ใช่ → ควร log error "Cannot open web!" และทำ URL ต่อไป
+   - หมายเหตุ: ถ้าเว็บล่มชั่วคราว (เน็ตหลุด/เซิร์ฟเวอร์ error) แอปจะลองใหม่ให้ 3 ครั้ง ห่างกัน 2 วินาที ก่อนขึ้นข้อความ error — ใช้เวลาราว 6 วินาที ถ้า URL นั้นติดต่อไม่ได้เลยตลอด
 
 #### ทดสอบไม่เลือกโฟลเดอร์
 

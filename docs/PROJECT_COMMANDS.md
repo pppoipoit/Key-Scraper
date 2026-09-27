@@ -95,7 +95,7 @@ Run from the project root folder:
 ```bash
 python -m unittest discover tests
 ```
-Expected: `Ran 19 tests ... OK` (about 0.02s, no internet needed — all HTTP calls are mocked).
+Expected: `Ran 26 tests ... OK` (about 0.04s, no internet needed — all HTTP calls are mocked).
 
 Verbose output:
 ```bash
@@ -108,6 +108,7 @@ python -m unittest discover tests -v
 - `extract_keyboard_image_url()` — URL joining
 - `get_detail_rows()` — header row filtering
 - `download_image()` — retry behaviour (5xx / connection errors / 4xx / empty URL)
+- `fetch_page()` — retry behaviour (success first try / success after retry / all retries exhausted / 4xx no retry / 5xx retry / connection error retry / non-network error no retry)
 
 **Not covered** (still manual): the tkinter UI, the threading model, and anything that needs a real website. Use the manual tests below for those.
 

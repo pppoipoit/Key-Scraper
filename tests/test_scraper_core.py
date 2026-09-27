@@ -32,6 +32,7 @@ from scraper_core import (
     build_brand_folders,
     download_image,
     extract_keyboard_image_url,
+    fetch_page,
     get_brand_name,
     get_detail_rows,
 )
@@ -253,6 +254,152 @@ class TestDownloadImageRetry(unittest.TestCase):
         self.assertEqual(mock_get.call_count, 1)
         mock_sleep.assert_not_called()
         self.assertTrue(self.logs[-1].startswith("Error downloading: model5"))
+
+
+class TestFetchPageRetry(unittest.TestCase):
+    """fetch_page() retry: ไม่ให้หน้าเว็บทั้งหน้าหายจาก network error ชั่วคราว
+    - ใช้ DOWNLOAD_MAX_RETRIES / DOWNLOAD_RETRY_DELAY_SECONDS ชุดเดียวกับ download_image()
+    - retry เฉพาะ network error + HTTP 5xx ; HTTP 4xx หยุดทันที
+    - mock ทั้ง requests.get และ time.sleep ไม่แตะ network จริง"""
+
+    PAGE_URL = "https://example.com/product.php?id=1"
+    PAGE_HTML = '<div class="detail_row"><div class="f_box">AC123</div></div>'
+
+    def setUp(self):
+        self.logs = []
+
+    @classmethod
+    def _mock_page(cls, status_code=200, text=None):
+        """สร้าง response จำลองเหมือน requests จริง:
+        raise_for_status() ต้อง raise HTTPError จริงเมื่อ status >= 400"""
+        res = mock.Mock()
+        res.status_code = status_code
+        res.text = cls.PAGE_HTML if text is None else text
+        res.reason = "mock"
+        if status_code >= 400:
+            res.url = cls.PAGE_URL
+            res.raise_for_status.side_effect = requests.exceptions.HTTPError(
+                f"{status_code} Error", response=res
+            )
+        return res
+
+    def test_fetch_page_success_first_try(self):
+        """สำเร็จครั้งแรก: ไม่ retry, ไม่ sleep, ได้ BeautifulSoup กลับไป"""
+        with mock.patch.object(
+            scraper_core.requests, "get", return_value=self._mock_page(200)
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            soup = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNotNone(soup)
+        self.assertIsInstance(soup, BeautifulSoup)
+        self.assertEqual(soup.find("div", class_="f_box").text.strip(), "AC123")
+        self.assertEqual(mock_get.call_count, 1)
+        mock_sleep.assert_not_called()
+        self.assertEqual(self.logs, [])
+
+    def test_fetch_page_success_after_retry(self):
+        """fail 2 ครั้ง (timeout, HTTP 503) แล้วสำเร็จครั้งที่ 3"""
+        responses = [
+            requests.exceptions.Timeout("too slow"),
+            self._mock_page(503),
+            self._mock_page(200),
+        ]
+        with mock.patch.object(
+            scraper_core.requests, "get", side_effect=responses
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            soup = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNotNone(soup)
+        self.assertIsInstance(soup, BeautifulSoup)
+        self.assertEqual(mock_get.call_count, 3)
+        self.assertEqual(mock_sleep.call_count, 2)
+        mock_sleep.assert_called_with(scraper_core.DOWNLOAD_RETRY_DELAY_SECONDS)
+        # log ต้องบอกว่า retry ครั้งไหน บน URL ไหน
+        self.assertTrue(any("Retry 1/3" in msg for msg in self.logs))
+        self.assertTrue(any("Retry 2/3" in msg for msg in self.logs))
+        self.assertTrue(any(self.PAGE_URL in msg for msg in self.logs))
+        # สำเร็จแล้วต้องไม่มี error message
+        self.assertFalse(any("Cannot open web" in msg for msg in self.logs))
+
+    def test_fetch_page_fails_after_all_retries(self):
+        """fail ครบทุก attempt -> คืน None + log error เดิม (ไม่ throw exception)"""
+        with mock.patch.object(
+            scraper_core.requests,
+            "get",
+            side_effect=requests.exceptions.ConnectionError("always down"),
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            result = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNone(result)
+        self.assertEqual(mock_get.call_count, scraper_core.DOWNLOAD_MAX_RETRIES + 1)
+        self.assertEqual(mock_sleep.call_count, scraper_core.DOWNLOAD_MAX_RETRIES)
+        # retry log 3 บรรทัด + error log 1 บรรทัด
+        self.assertEqual(len(self.logs), scraper_core.DOWNLOAD_MAX_RETRIES + 1)
+        self.assertTrue(self.logs[-1].startswith("Cannot open web!"))
+        self.assertTrue(self.logs[-1].endswith("always down"))
+
+    def test_fetch_page_no_retry_on_404(self):
+        """HTTP 4xx: retry ไม่ช่วย -> fail ทันที ไม่ sleep"""
+        with mock.patch.object(
+            scraper_core.requests, "get", return_value=self._mock_page(404)
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            result = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNone(result)
+        self.assertEqual(mock_get.call_count, 1)
+        mock_sleep.assert_not_called()
+        self.assertEqual(
+            self.logs, ["Cannot open web! Check your URL again, Boss! | HTTP 404"]
+        )
+
+    def test_fetch_page_retries_on_500(self):
+        """HTTP 5xx: เซิร์ฟเวอร์มีปัญหาชั่วคราว -> retry ได้ (401/403 ต้องไม่ retry)"""
+        with mock.patch.object(
+            scraper_core.requests, "get", return_value=self._mock_page(500)
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            result = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNone(result)
+        self.assertEqual(mock_get.call_count, scraper_core.DOWNLOAD_MAX_RETRIES + 1)
+        self.assertEqual(mock_sleep.call_count, scraper_core.DOWNLOAD_MAX_RETRIES)
+        self.assertTrue(any("Retry 1/3" in msg for msg in self.logs))
+        self.assertTrue(self.logs[-1].endswith("HTTP 500"))
+
+        for code in (401, 403):
+            with self.subTest(status=code):
+                self.logs.clear()
+                with mock.patch.object(
+                    scraper_core.requests, "get", return_value=self._mock_page(code)
+                ) as mock_get_4xx, mock.patch.object(
+                    scraper_core.time, "sleep"
+                ) as mock_sleep_4xx:
+                    result_4xx = fetch_page(self.PAGE_URL, self.logs.append)
+                self.assertIsNone(result_4xx)
+                self.assertEqual(mock_get_4xx.call_count, 1)
+                mock_sleep_4xx.assert_not_called()
+
+    def test_fetch_page_retries_on_connection_error(self):
+        """connection/DNS error: retry ได้ แล้วสำเร็จใน attempt สุดท้าย"""
+        responses = [
+            requests.exceptions.ConnectionError("dns fail"),
+            requests.exceptions.ConnectionError("refused"),
+            requests.exceptions.Timeout("too slow"),
+            self._mock_page(200),
+        ]
+        with mock.patch.object(
+            scraper_core.requests, "get", side_effect=responses
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            soup = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNotNone(soup)
+        self.assertEqual(mock_get.call_count, scraper_core.DOWNLOAD_MAX_RETRIES + 1)
+        self.assertEqual(mock_sleep.call_count, scraper_core.DOWNLOAD_MAX_RETRIES)
+        self.assertTrue(any("Retry 3/3" in msg for msg in self.logs))
+
+    def test_fetch_page_no_retry_on_non_network_error(self):
+        """error ที่ไม่ใช่ network (เช่น HTML พัง) ต้อง fail ทันที ไม่ retry"""
+        with mock.patch.object(
+            scraper_core.requests, "get", side_effect=ValueError("bad html")
+        ) as mock_get, mock.patch.object(scraper_core.time, "sleep") as mock_sleep:
+            result = fetch_page(self.PAGE_URL, self.logs.append)
+        self.assertIsNone(result)
+        self.assertEqual(mock_get.call_count, 1)
+        mock_sleep.assert_not_called()
+        self.assertTrue(self.logs[-1].endswith("bad html"))
 
 
 if __name__ == "__main__":

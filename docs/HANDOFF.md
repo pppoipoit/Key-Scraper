@@ -1,6 +1,6 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-27 — TC-002: retry mechanism for image downloads + automated unit tests for core logic added (OQ-006, OQ-008 now Implemented) — commit + push to main
+**Last updated**: 2026-09-27 — TC-002 follow-up: retry mechanism extended to page fetching (`fetch_page()`) for full resilience at both page and image level + 7 new unit tests (26 total) — commit + push to main
 **Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
 **Owner**: DRKMTTR Studio (Tokenmee)
 
@@ -53,7 +53,8 @@ Pillow
 - Scrollable log panel with live updates
 - Image downloads saved to structured folders
 - **Retry on failed downloads (TC-002)**: network errors (timeout/connection) and HTTP 5xx are retried up to 3 times with a 2-second wait, running inside the background worker thread only; permanent failures (e.g. HTTP 4xx) are logged and skipped
-- **Automated unit tests for core logic (TC-002)**: 19 tests in `tests/test_scraper_core.py` covering brand detection (ADR-002), Korean folder names, URL joining, row filtering and retry behaviour — run with `python -m unittest discover tests` (no network needed, no new dependencies)
+- **Retry on failed page fetches (TC-002 follow-up)**: `fetch_page()` uses the same retry rules and the same constants (`DOWNLOAD_MAX_RETRIES` / `DOWNLOAD_RETRY_DELAY_SECONDS`) as image downloads, so a temporary network glitch while loading a product page no longer discards the whole page of images — only that one URL is skipped. HTTP 4xx still fails immediately. The function is still pure and still returns `BeautifulSoup` or `None`; the user-facing message `"Cannot open web! Check your URL again, Boss!"` is unchanged. Note: a permanently unreachable URL now takes about 6 seconds longer to report the failure (3 × 2s waits) before the same message appears.
+- **Automated unit tests for core logic (TC-002)**: 26 tests in `tests/test_scraper_core.py` covering brand detection (ADR-002), Korean folder names, URL joining, row filtering and retry behaviour for both image downloads and page fetching — run with `python -m unittest discover tests` (no network needed, no new dependencies)
 - Thread-safe UI updates via `root.after()`
 - Custom gradient/rounded widgets (PIL-rendered)
 - Build system produces `Key_Scraper.exe` and `Key_Scraper_Setup.exe`
@@ -114,6 +115,7 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
+| 2026-09-27 | TC-002 follow-up: retry logic added to `fetch_page()` (3 retries, 2s wait, network errors + HTTP 5xx) so a temporary network glitch no longer loses an entire page of images; 7 new unit tests added for page-fetch retry (26 total). Reused the existing `DOWNLOAD_MAX_RETRIES` / `DOWNLOAD_RETRY_DELAY_SECONDS` constants; `fetch_page()` signature and return value unchanged | Boss approved adding retry to `fetch_page()` for page-level resilience; OQ-008 now covers both image downloads and page fetching | scraper_core.py (`fetch_page()` only), tests/test_scraper_core.py, docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 26 tests OK (0.038s, offline); HTTP 4xx verified to fail immediately with no retry; no tkinter/threading/brand-folder changes |
 | 2026-09-27 | TC-002: Retry mechanism for image downloads (3 retries, 2s wait, network errors + HTTP 5xx) + 19 automated unit tests for core logic; OQ-006 and OQ-008 marked Implemented | PM (Mo-Mo) + Boss approved TC-002; answers to OQ-006 (tests = YES) and OQ-008 (retry = YES) | scraper_core.py, tests/test_scraper_core.py (new), docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 19 tests OK; no tkinter/threading changes; brand mapping unchanged (asserted by tests) |
 | 2026-09-27 | Docs cleanup: Single Build decision recorded as ADR-006 (resolved numbering conflict), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed | PM order: documentation must reflect absolute truth; Boss approved ADR-006 renumbering | docs/WINDOWS_COMPATIBILITY.md, docs/04_DECISIONS.md, docs/CHANGELOG.md, docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, docs/HANDOFF.md | Committed + pushed to main |
 | 2026-09-27 | Simplified build: removed separate Win7/Win10 scripts, single build for all Windows | Boss decision | requirements.txt, docs/ | Pushed to GitHub (2e9a4b4) |
@@ -253,7 +255,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 > **Project**: LaptopKey Scraper - Elite Edition v2 (Windows desktop GUI, Python/tkinter)
 > 
-> **Current state**: TC-002 **COMPLETE** (2026-09-27) — retry mechanism for image downloads + 19 automated unit tests for the core logic. Documentation, workflows, rules, and owner manuals are populated with verified information from source code. Ready for next task selection.
+> **Current state**: TC-002 **COMPLETE** including its follow-up (2026-09-27) — retry mechanism now covers BOTH image downloads (`download_image()`) and page fetching (`fetch_page()`), with 26 automated unit tests for the core logic. Documentation, workflows, rules, and owner manuals are populated with verified information from source code. Ready for next task selection.
 > 
 > **Key files to read first**:
 > - `docs/HANDOFF.md` (this file) — current status and next actions
@@ -266,7 +268,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 > 
 > **Open questions**: OQ-006 (automated tests) and OQ-008 (retry logic) are **Implemented** (TC-002). OQ-007 (alternative brand folder strategy) still needs owner input in `docs/OPEN_QUESTIONS.md`.
 > 
-> **Tests**: `python -m unittest discover tests` (19 tests, offline, stdlib only). UI and threading are still verified manually.
+> **Tests**: `python -m unittest discover tests` (26 tests, offline, stdlib only). UI and threading are still verified manually.
 > 
 > **No secrets, no database, no auth** — verified clean repository.
 > 
@@ -276,6 +278,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 ## Last Updated
 
+2026-09-27 — TC-002 follow-up: retry logic added to `fetch_page()` (3 retries, 2s wait, network errors + HTTP 5xx, HTTP 4xx immediate fail, worker thread only) reusing the existing download retry constants; 7 new unit tests in `tests/test_scraper_core.py` (26 total, all HTTP mocked); OQ-008 updated to cover page fetching; docs updated (OPEN_QUESTIONS, HANDOFF, CHANGELOG, CURRENT_TASK, PROJECT_COMMANDS, QA_CHECKLIST) — only .py change is `fetch_page()` in scraper_core.py, committed + pushed to main
 2026-09-27 — TC-002: retry mechanism added to `download_image()` (3 retries, 2s wait, network errors + HTTP 5xx, worker thread only) + new `tests/test_scraper_core.py` (19 tests, stdlib unittest, all HTTP mocked); OQ-006 / OQ-008 marked Implemented; docs updated (OPEN_QUESTIONS, HANDOFF, CHANGELOG, CURRENT_TASK, PROJECT_COMMANDS, QA_CHECKLIST) — only .py change is scraper_core.py, committed + pushed to main
 2026-09-27 — Docs cleanup: ADR conflict resolved (Single Build recorded as ADR-006 in 04_DECISIONS.md + WINDOWS_COMPATIBILITY.md), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed from PROJECT_COMMANDS.md / REPOSITORY_AUDIT.md / HANDOFF.md — .md files only, no .py changes, committed + pushed to main
 2026-09-27 — TC-005: Simplify build — deleted build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt; single requirements.txt with Pillow<=9.5.0; updated docs/WINDOWS_COMPATIBILITY.md, README.md, HANDOFF.md, CHANGELOG.md, CURRENT_TASK.md — docs/config only, no .py changes, committed + pushed to main

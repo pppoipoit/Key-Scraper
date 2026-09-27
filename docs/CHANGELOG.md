@@ -6,8 +6,9 @@
 
 ### Added
 
+- Retry mechanism for page fetching in `scraper_core.py` — `fetch_page()` now retries network timeouts, connection errors, and HTTP 5xx up to 3 times (2-second wait between attempts) using the same retry constants as image downloads. Without this, a single hiccup while loading a product page lost the *entire page* of images; now only that individual image is skipped. HTTP 4xx (404/403/401) still fails immediately because retrying cannot help, and the user-facing message stays exactly `"Cannot open web! Check your URL again, Boss!"`. `fetch_page()` remains a pure function — its signature and return value (`BeautifulSoup` or `None`) are unchanged (OQ-008 follow-up)
 - Retry mechanism for failed image downloads in `scraper_core.py` — network timeouts, connection errors, and HTTP 5xx are retried up to 3 times (2-second wait between attempts) inside the existing background worker thread. Permanent failures (e.g. HTTP 4xx) are logged and skipped without retry, as before (TC-002 / OQ-008)
-- Automated unit tests for the core logic in `tests/test_scraper_core.py` — 19 tests covering brand detection (ADR-002 compliance), Korean folder names, URL joining, and retry behaviour. Run with `python -m unittest discover tests`; uses the standard-library `unittest` only and performs no network access (TC-002 / OQ-006)
+- Automated unit tests for the core logic in `tests/test_scraper_core.py` — 26 tests covering brand detection (ADR-002 compliance), Korean folder names, URL joining, and retry behaviour for both image downloads and page fetching. Run with `python -m unittest discover tests`; uses the standard-library `unittest` only and performs no network access (TC-002 / OQ-006)
 
 ### Changed
 

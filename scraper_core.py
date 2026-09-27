@@ -21,9 +21,10 @@ PAGE_HEADERS = {
 }
 IMAGE_HEADERS = {"User-Agent": "Mozilla/5.0"}
 
-# Retry สำหรับการดาวน์โหลดรูป (TC-002 / OQ-008)
+# Retry สำหรับการดาวน์โหลดรูป และการโหลดหน้าเว็บ (TC-002 / OQ-008)
 # ถ้าเจอ network error (timeout/connection) หรือ HTTP 5xx ให้รอแล้วลองใหม่
 # สูงสุด 3 ครั้ง (รวม attempt แรก = 4 ครั้ง) ห่างกันครั้งละ 2 วินาที
+# ใช้ชุดค่านี้ร่วมกันทั้ง download_image() และ fetch_page() เพื่อให้พฤติกรรมเหมือนกัน
 DOWNLOAD_MAX_RETRIES = 3
 DOWNLOAD_RETRY_DELAY_SECONDS = 2
 
@@ -114,15 +115,41 @@ def download_image(url, folder, filename, log_callback=None):
 
 
 def fetch_page(url, log_callback=None):
-    """โหลดหน้าเว็บ + parse เป็น BeautifulSoup คืนค่า None ถ้าผิดพลาด (error message เดิม)"""
-    try:
-        res = requests.get(url, headers=PAGE_HEADERS)
-        res.raise_for_status()
-    except Exception as e:
-        if log_callback:
-            log_callback(f"Cannot open web! Check your URL again, Boss! | {e}")
-        return None
-    return BeautifulSoup(res.text, "html.parser")
+    """โหลดหน้าเว็บ + parse เป็น BeautifulSoup คืนค่า None ถ้าผิดพลาด (error message เดิม)
+    + Retry: ถ้าเจอ network error (timeout/connection/DNS) หรือ HTTP 5xx
+    จะรอ DOWNLOAD_RETRY_DELAY_SECONDS แล้วลองใหม่ สูงสุด DOWNLOAD_MAX_RETRIES ครั้ง
+    (ใช้ค่าคงที่ชุดเดียวกับ download_image เพื่อให้พฤติกรรมสม่ำเสมอ)
+    *** ฟังก์ชันนี้ถูกเรียกจาก worker thread ของ ThreadPoolExecutor เท่านั้น
+        ดังนั้น time.sleep() ในนี้ปลอดภัย ไม่กระทบ UI thread (ห้ามเรียกจาก main thread) ***"""
+    last_error = ""
+    for attempt in range(DOWNLOAD_MAX_RETRIES + 1):
+        try:
+            res = requests.get(url, headers=PAGE_HEADERS)
+            res.raise_for_status()
+            return BeautifulSoup(res.text, "html.parser")
+        except requests.exceptions.HTTPError as e:
+            # 4xx = URL ผิด/ไม่มีสิทธิ์ -> retry ไม่ช่วย , 5xx = เซิร์ฟเวอร์มีปัญหา -> retry ได้
+            status = getattr(e.response, "status_code", None)
+            last_error = f"HTTP {status}" if status is not None else str(e)
+            if status is not None and status < 500:
+                break
+        except requests.exceptions.RequestException as e:
+            last_error = str(e)  # timeout / connection error / DNS -> retry ได้
+        except Exception as e:
+            last_error = str(e)
+            break  # error อื่น (เช่น HTML พัง) retry ไม่ช่วย
+
+        if attempt < DOWNLOAD_MAX_RETRIES:
+            if log_callback:
+                log_callback(
+                    f"Retry {attempt + 1}/{DOWNLOAD_MAX_RETRIES} for {url} in "
+                    f"{DOWNLOAD_RETRY_DELAY_SECONDS}s | {last_error}"
+                )
+            time.sleep(DOWNLOAD_RETRY_DELAY_SECONDS)
+
+    if log_callback:
+        log_callback(f"Cannot open web! Check your URL again, Boss! | {last_error}")
+    return None
 
 
 def extract_keyboard_image_url(soup, base_url):
