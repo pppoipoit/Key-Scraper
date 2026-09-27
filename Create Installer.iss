@@ -25,7 +25,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; ดึงไฟล์และโฟลเดอร์ระบบทั้งหมดใน onedir (รวม Key_Scraper.exe + _internal\ ที่มี icon.ico ฝังอยู่แล้ว)
-Source: "dist\onedir\Key Scraper 2.0\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; IMPORTANT (2026-09-28): must point at the Python 3.8.10 build. The old folder
+; "dist\onedir\Key Scraper 2.0" is a Python 3.13 build whose python313.dll imports
+; api-ms-win-core-path-l1-1-0.dll -> installer would crash on Windows 7.
+Source: "dist\Key_Scraper\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
