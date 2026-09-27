@@ -2,19 +2,19 @@
 
 ## Task ID and title
 
-TC-006 — Rebuild distributable exe with Python 3.8 for Windows 7 compatibility
+**PROJECT CLOSED — v2.1.0 released.** Final task: v2.1.0 release publication (Windows 7 owner verification + release notes).
 
 ## Status
 
-**Completed** (2026-09-28) — exe rebuilt with Python 3.8.10 into `dist\Key_Scraper\`, root cause of the Windows 7 failure confirmed by static PE import analysis, docs updated (WINDOWS_COMPATIBILITY / HANDOFF / CHANGELOG), committed + pushed to main.
+**✅ CLOSED (2026-09-28)** — v2.1.0 shipped. Windows 7 compatibility **owner-verified**: the Python 3.8.10 rebuild was run on a real Windows 7 PC and launched without the `api-ms-win-core-path-l1-1-0.dll` error. The rebuilt installer (11,365,375 bytes) packages that same build. Docs updated, committed + pushed to main. **No further tasks are open.**
 
-**Repository state**: no `.py` file was modified. The previously distributed artifact was a **Python 3.13** build (`python313.dll` imports `api-ms-win-core-path-l1-1-0.dll` — the exact error the owner reported on Windows 7). The fresh build bundles `python38.dll` and imports **zero** post-Win7 API sets across all 31 bundled binaries. Korean folder names and ADR-002 logic untouched.
+**Repository state**: no `.py` file was ever modified in the Win7 work. The old artifact was a **Python 3.13** build (`python313.dll` imports `api-ms-win-core-path-l1-1-0.dll` — the exact error the owner hit). The fresh build bundles `python38.dll` with zero post-Win7 API-set imports across all 31 bundled binaries. Korean folder names and ADR-002 logic untouched. `Create Installer.iss` line 28 repointed from the 3.13 build to the 3.8 build so the installer can never silently repackage a broken build.
 
-**Validation actually run**: `python -m unittest discover tests` → `Ran 26 tests — OK` · launch smoke test → GUI alive after 8s · `python --version` → 3.8.10 · build log header `Python: 3.8.10`.
+**Validation actually run**: `python -m unittest discover tests` → `Ran 26 tests — OK` · static PE import scan (zero unsafe imports) · silent install to a temp dir + launch smoke test passed · **owner ran the exe on Windows 7 and it worked**.
 
-**Remaining manual step (owner)**: copy `dist\Key_Scraper\` to the Windows 7 PC and run it once. No physical Windows 7 machine was available for testing.
+**OQ-007 is now Deferred** (owner decision 2026-09-28) — the folder/brand structure stays exactly as-is per ADR-002.
 
-**Next task**: none queued — owner picks the next item (OQ-007 still needs owner input; see `docs/OPEN_QUESTIONS.md` and `docs/05_BACKLOG.md`).
+**Next task**: none. Project is closed. If work resumes, start by reading `docs/HANDOFF.md` and `docs/WINDOWS_COMPATIBILITY.md` — **the build MUST be done with Python 3.8.x or Windows 7 breaks.**
 
 ---
 
@@ -28,7 +28,7 @@ TC-002 (follow-up) — Extend Retry Mechanism to `fetch_page()` in scraper_core.
 
 **Repository state**: core scraping logic retries transient failures at both levels, and the pure core logic has automated test coverage. `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched (PM constraint).
 
-**Next task**: none queued — owner picks the next item (OQ-007 still needs owner input; see `docs/OPEN_QUESTIONS.md` and `docs/05_BACKLOG.md`).
+**Next task**: none queued — TC-002 is complete and superseded by TC-006 (Windows 7 rebuild) and the v2.1.0 release closure. OQ-007 is Deferred; see `docs/OPEN_QUESTIONS.md` and `docs/05_BACKLOG.md`.
 
 ## Goal
 

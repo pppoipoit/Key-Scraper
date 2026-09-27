@@ -85,9 +85,8 @@ the **build machine**, not the machines the exe is copied to. The 6.22.3 Windows
 (`bootloader\Windows-64bit-intel\runw.exe`) was scanned and imports **no** post-Win7 API sets,
 so PyInstaller 6.22.3 can still produce a Windows 7-capable exe when the interpreter is 3.8.x.
 
-**Fact vs assumption:** the "Win7-safe" verdict is based on static PE import analysis. The
-build has **not** been executed on a real Windows 7 machine — that final confirmation must be
-done on the Boss's Windows 7 PC.
+**Owner-verified (2026-09-28):** the rebuilt `dist\Key_Scraper\` was run on a real Windows 7 PC and launched
+without the `api-ms-win-core-path-l1-1-0.dll` error. The rebuilt `Key_Scraper_Setup.exe` packages the same build.
 
 ## Library Compatibility Note
 

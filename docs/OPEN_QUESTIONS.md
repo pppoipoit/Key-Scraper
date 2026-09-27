@@ -9,7 +9,7 @@
 | OQ-004 | ต้องการให้ export รายชื่อ URL หรือไม่? | เพื่อใช้งานซ้ำง่ายขึ้น | app.py | No | NO | Open |
 | OQ-005 | ต้องการให้รองรับ macOS หรือ Linux หรือไม่? | ปัจจุบัน icon.ico และ installer ออกแบบมาสำหรับ Windows | main.py, Create Installer.iss | No | NO | Open |
 | OQ-006 | ต้องการให้เพิ่ม automated test หรือไม่? | ✅ ตอนนี้มี unit test แล้วที่ tests/test_scraper_core.py (รัน: python -m unittest discover tests) | tests/, QA_CHECKLIST.md | No | YES | Implemented |
-| OQ-007 | ต้องการให้จัดเก็บรูปตามชื่อแบรนด์แบบอื่นหรือไม่? | ปัจจุบันใช้ prefix ของชื่อโมเดล (เช่น ACxxx → Acer) | scraper_core.py | No | [NEEDS OWNER INPUT] | Open |
+| OQ-007 | ต้องการให้จัดเก็บรูปตามชื่อแบรนด์แบบอื่นหรือไม่? | ปัจจุบันใช้ prefix ของชื่อโมเดล (เช่น ACxxx → Acer) | scraper_core.py | No | เลื่อนไปก่อน — โปรเจกต์ปิด v2.1.0 โดยไม่เปลี่ยน (ADR-002: ห้ามแก้ชื่อโฟลเดอร์ภาษาเกาหลี) | Deferred |
 | OQ-008 | ต้องการให้ retry เมื่อดาวน์โหลดรูปไม่สำเร็จหรือไม่? | ✅ ตอนนี้ retry อัตโนมัติแล้ว (3 ครั้ง ห่างกัน 2 วินาที) เมื่อเจอ network error หรือ HTTP 5xx — ครอบคลุมทั้ง **การดาวน์โหลดรูป (`download_image()`)** และ **การโหลดหน้าเว็บ (`fetch_page()`)** | scraper_core.py | No | YES | Implemented |
 
 ---
@@ -33,5 +33,5 @@
 | OQ-004 | NO | - | - |
 | OQ-005 | NO | - | - |
 | OQ-006 | YES | - | - |
-| OQ-007 | [NEEDS OWNER INPUT] | - | - |
+| OQ-007 | เลื่อนไปก่อน (Deferred) เมื่อ 2026-09-28 — ปิดโปรเจกต์ v2.1.0 โดยคงโครงสร้างเดิม | 2026-09-28 | Boss |
 | OQ-008 | YES | - | - |

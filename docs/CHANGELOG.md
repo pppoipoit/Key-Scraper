@@ -3,31 +3,31 @@
 ประวัติการเปลี่ยนแปลงทั้งหมดของ LaptopKey Scraper - Elite Edition
 รูปแบบ: [Semantic Versioning](https://semver.org/lang/th/)
 
-## [Unreleased]
+## [2.1.0] - 2026-09-28
 
-### 🔧 Fixed
+### 🎉 Production Ready Release — **Windows 7 owner-verified**
 
-- **Windows 7 compatibility — exe rebuilt with Python 3.8.10.** The previously distributed build failed on Windows 7 with `api-ms-win-core-path-l1-1-0.dll is missing`. Root cause confirmed by static PE import analysis, not guessed: the old bundle shipped **`python313.dll`**, which imports `api-ms-win-core-path-l1-1-0.dll` — an API set Windows 7 does not provide. (The old bundle also shipped `cryptography\_rust.pyd`, importing `api-ms-win-core-synch-l1-2-0.dll` — a second Win7 blocker — plus `numpy` and `lxml`, none of which are in `requirements.txt`.)
-- **Rebuilt artifact:** `dist\Key_Scraper\Key_Scraper.exe` (2,599,618 bytes) built with Python **3.8.10** + PyInstaller 6.22.3. Bundles `python38.dll`; a scan of all 31 `.exe`/`.dll`/`.pyd` files in the bundle found **zero** post-Win7 API-set imports. Launch smoke test passed (GUI alive after 8s) and `python -m unittest discover tests` → `Ran 26 tests — OK`.
+This release marks the project as **Production Ready**, **closed**, and **verified working on Windows 7** by the owner on 2026-09-28.
+
+#### 🔧 Fixed — Windows 7 compatibility (owner-verified)
+- **The distributed exe was rebuilt with Python 3.8.10.** The previously distributed build failed on Windows 7 with `api-ms-win-core-path-l1-1-0.dll is missing`. Root cause confirmed by static PE import analysis, not guessed: the old bundle shipped **`python313.dll`**, which imports `api-ms-win-core-path-l1-1-0.dll` — an API set Windows 7 does not provide. (The old bundle also shipped `cryptography\_rust.pyd`, importing `api-ms-win-core-synch-l1-2-0.dll` — a second Win7 blocker — plus `numpy` and `lxml`, none of which are in `requirements.txt`.)
+- **Rebuilt artifact:** `dist\Key_Scraper\Key_Scraper.exe` (2,599,618 bytes) built with Python **3.8.10** + PyInstaller 6.22.3. Bundles `python38.dll`; a scan of all 31 `.exe`/`.dll`/`.pyd` files found **zero** post-Win7 API-set imports. `python -m unittest discover tests` → `Ran 26 tests — OK`.
+- **Rebuilt installer:** `dist\installer\Key_Scraper_Setup.exe` (11,365,375 bytes) built with Inno Setup 7.0.1-beta. `Create Installer.iss` line 28 was repointed from the 3.13 build to the 3.8 build, so the installer can no longer silently repackage a Windows 7-broken artifact. Verified: silent install (exit 0), only `python38.dll` installed, app launched, installer itself imports no post-Win7 API set.
 - **PyInstaller 6.22.3 confirmed usable for Windows 7 targets.** Its "runs in Windows 8 and newer" note refers to the *build* machine, not the destination; the 6.22.3 Windows bootloader itself imports no post-Win7 API sets. No dependency downgrade was needed.
+- **✅ Owner verification (2026-09-28):** the rebuilt exe was run on a real Windows 7 PC and launched **without** the `api-ms-win-core-path-l1-1-0.dll` error.
 
-### ⚠️ Deprecated
+#### ⚠️ Deprecated
+- **All pre-2026-09-28 build artifacts, including the old `dist\installer\Key_Scraper_Setup.exe` (29,311,454 bytes) and `dist\onedir\Key Scraper 2.0\`.** They are Python 3.13 builds and are **not** Windows 7 compatible. Only the rebuilt `dist\Key_Scraper\` supports Windows 7.
 
-- **All pre-2026-09-28 build artifacts, including `dist\installer\Key_Scraper_Setup.exe`.** They are Python 3.13 builds and are **not** Windows 7 compatible. Only the freshly rebuilt `dist\Key_Scraper\` supports Windows 7.
+#### ⚠️ Build rule (must not be forgotten)
+- **The build MUST be performed with Python 3.8.x.** A build made with Python 3.9+ will not run on Windows 7. See `docs/WINDOWS_COMPATIBILITY.md` for the warning box and the 5-second `python38.dll` vs `python313.dll` check.
 
-### 📖 Documentation
-
-- `docs/WINDOWS_COMPATIBILITY.md`: added a critical warning box at the top — the build MUST use Python 3.8.x; added the 5-second `_internal\python38.dll` vs `python313.dll` check, the verified-build record, and the evidence table for the old failure.
-- `docs/HANDOFF.md`: Known Limitations rows 12 and 13 record that old dist artifacts are 3.9+ (actually 3.13) builds and that Win7 support is statically verified only.
-- No `.py` source files were modified in this task; no Korean folder names or ADR-002 logic touched.
-
----
-
-## [2.1.0] - 2026-09-27
-
-### 🎉 Production Ready Release
-
-This release marks the project as **Production Ready** with comprehensive resilience and testing.
+#### 📖 Documentation
+- `docs/WINDOWS_COMPATIBILITY.md`: critical warning box, 5-second check, verified-build record, evidence table for the old failure.
+- `docs/HANDOFF.md`: status set to Closed (v2.1.0), Win7 verification row added, known limitations updated to owner-verified.
+- `docs/OPEN_QUESTIONS.md`: OQ-006 / OQ-008 Implemented, **OQ-007 now Deferred** (owner decision 2026-09-28).
+- `docs/CURRENT_TASK.md`: project marked **CLOSED**.
+- No `.py` source files were modified; no Korean folder names or ADR-002 logic touched.
 
 #### Added
 - **Retry Mechanism (2 layers):**

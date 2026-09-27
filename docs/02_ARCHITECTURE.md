@@ -257,7 +257,7 @@ Output: `dist\Key_Scraper\` (contains Key_Scraper.exe + _internal/ folder with b
 6. **No progress percentage**: Progress bar shows fraction of URLs completed, not per-image progress
 7. **Fixed window size**: 980×600, non-resizable
 8. **Windows icon**: icon.ico may not display on Linux/macOS
-9. **No automated tests**: Testing is manual only
+9. **Automated tests cover core logic only** — 26 unit tests in `tests/test_scraper_core.py` (brand detection, folder structure, URL joining, row filtering, retry at both layers). The tkinter UI and threading model are still verified manually
 10. **No log file**: Logs are in-memory only, lost on close
 
 ---

@@ -1,7 +1,7 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-27 — v2.1.0 "Production Ready" release prepared (CHANGELOG + RELEASE notes finalized). Documentation-only task; no `.py` changes.
-**Status**: **Production Ready — Project Closed** (per Boss decision 2026-09-27). All planned work complete: retry mechanism (2 layers) + 26 passing automated tests + GitHub portfolio setup.
+**Last updated**: 2026-09-28 — v2.1.0 "Production Ready" **owner-verified on Windows 7**; project closed. Documentation-only task; no `.py` changes.
+**Status**: **Production Ready — Project Closed (v2.1.0)** (per Boss decision 2026-09-27, Win7 verification confirmed 2026-09-28). All planned work complete: retry mechanism (2 layers) + 26 passing automated tests + Windows 7 rebuild verified by the owner + GitHub portfolio setup.
 **Owner**: DRKMTTR Studio (Tokenmee)
 
 ---
@@ -60,9 +60,10 @@ Pillow
 - Build system produces `Key_Scraper.exe` and `Key_Scraper_Setup.exe`
 - Existing build artifacts present in `dist/`
 
-### ⚠️ Partially Complete
-- **Documentation**: All core docs populated with verified content. Open questions remain for owner input.
-- **Thread safety**: Bug was found and fixed during testing, but no regression test exists.
+### ✅ Closed Out (v2.1.0 — 2026-09-28)
+- **Documentation**: All core docs populated with verified content and the project is closed. OQ-007 is **Deferred** (owner decision 2026-09-28) — no open questions remain.
+- **Windows 7 support**: owner-verified on a real Windows 7 PC after the Python 3.8.10 rebuild.
+- **Release**: v2.1.0 — see `docs/CHANGELOG.md` and `docs/WINDOWS_COMPATIBILITY.md`.
 - **GitHub Release v2.0.0**: Tag + Release NOT yet published (no tags in repo, `gh` CLI not installed). Owner manual publish pending — see CHANGELOG.md release notes.
 
 ### ✅ Completed — GitHub Portfolio Setup
@@ -92,8 +93,8 @@ Pillow
 9. **No log file** — logs are in-memory only, lost on close
 10. **No persistent config** — folder path not saved between sessions
 11. **Windows 7 requires Python 3.8.x only** — Python 3.9+ builds will not run on Windows 7; the single build uses `requirements.txt` (Pillow pinned `<=9.5.0`) and must be produced on Python 3.8.x
-12. **⚠️ OLD `dist/` ARTIFACTS ARE NOT WINDOWS 7 COMPATIBLE (verified 2026-09-28)** — the previously shipped artifacts (`dist\onedir\Key Scraper 2.0\` and `dist\installer\Key_Scraper_Setup.exe`) are **Python 3.13** builds, not 3.8. Static scan found `python313.dll` importing `api-ms-win-core-path-l1-1-0.dll` (the exact error reported by the owner) plus `cryptography\_rust.pyd` importing `api-ms-win-core-synch-l1-2-0.dll`. **Only the freshly rebuilt `dist\Key_Scraper\` (Python 3.8.10, bundles `python38.dll`, zero post-Win7 API-set imports) supports Windows 7.** Treat any pre-2026-09-28 build — including `Key_Scraper_Setup.exe` — as **not** for Windows 7. See `docs/WINDOWS_COMPATIBILITY.md`.
-13. **Win7 compatibility is statically verified only** — the rebuild was confirmed by PE import analysis, a launch smoke test on this Windows 10 machine, and `Ran 26 tests — OK`. It has **not** been run on a real Windows 7 PC; that final confirmation is the owner's manual step.
+12. **⚠️ OLD `dist/` ARTIFACTS ARE NOT WINDOWS 7 COMPATIBLE (verified 2026-09-28)** — the previously shipped artifacts (`dist\onedir\Key Scraper 2.0\` and the *old* `dist\installer\Key_Scraper_Setup.exe`, 29,311,454 bytes) are **Python 3.13** builds, not 3.8. Static scan found `python313.dll` importing `api-ms-win-core-path-l1-1-0.dll` (the exact error reported by the owner) plus `cryptography\_rust.pyd` importing `api-ms-win-core-synch-l1-2-0.dll`. **Only the freshly rebuilt `dist\Key_Scraper\` (Python 3.8.10, bundles `python38.dll`, zero post-Win7 API-set imports) supports Windows 7**, and the rebuilt `Key_Scraper_Setup.exe` (11,365,375 bytes, Inno Setup 7.0.1-beta, now sourced from `dist\Key_Scraper\*`) packages that same build — **owner-verified working on Windows 7 on 2026-09-28**. See `docs/WINDOWS_COMPATIBILITY.md`.
+13. **Win7 compatibility — owner-verified 2026-09-28** ✅ — the Python 3.8.10 rebuild was run on a real Windows 7 PC by the owner and launched **without** the `api-ms-win-core-path-l1-1-0.dll` error. Before that test, evidence was: static PE import analysis (zero post-Win7 API sets across all 31 bundled binaries), `Ran 26 tests — OK`, and a silent-install + launch smoke test. This limitation is now **closed**.
 
 
 ## Documentation Status
@@ -106,7 +107,7 @@ Pillow
 - **Root README.md**: Updated with AI-Assisted Development Workflow section
 
 ### ⏳ Pending Owner Input
-- **OPEN_QUESTIONS.md**: OQ-006 (automated tests) and OQ-008 (retry logic) are now **Implemented** (TC-002, 2026-09-27). OQ-007 (alternative brand folder strategy) still needs owner input; OQ-001 to OQ-005 have owner answers recorded.
+- **OPEN_QUESTIONS.md**: OQ-006 (automated tests) and OQ-008 (retry logic) are **Implemented** (TC-002, 2026-09-27). OQ-007 (alternative brand folder strategy) is **Deferred** (owner decision 2026-09-28) — existing structure kept per ADR-002. OQ-001 to OQ-005 have owner answers recorded. **No open questions remain.**
 - What remains:
   - สร้าง HANDOFF.md (นี่แหละ), QA_CHECKLIST.md, GLOSSARY.md, CHANGELOG.md, OPEN_QUESTIONS.md, PROJECT_COMMANDS.md
   - สร้าง docs/workflows/ ทั้ง 6 ไฟล์
@@ -122,6 +123,7 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
+| 2026-09-28 | **Win7 verification passed by owner** — the exe rebuilt with Python 3.8.10 was copied to a real Windows 7 PC and ran **without** the `api-ms-win-core-path-l1-1-0.dll` error. Root cause of the earlier failure was the old Python 3.13 artifact (`python313.dll` imports that API set). Documentation updated to state the build MUST use Python 3.8.x. | Boss reported the Windows 7 test passed; PM opened the release gate for v2.1.0 | `Create Installer.iss` (line 28 repointed from the 3.13 build to the 3.8 build), docs/WINDOWS_COMPATIBILITY.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/OPEN_QUESTIONS.md, docs/CURRENT_TASK.md | **Owner-verified** on Windows 7. Before the owner test: `Ran 26 tests — OK`; static PE import scan of all 31 bundled binaries found zero post-Win7 API sets; silent install to a temp dir + launch smoke test passed. Build output stays in `dist/` (local only, gitignored) |
 | 2026-09-27 | TC-002 follow-up: retry logic added to `fetch_page()` (3 retries, 2s wait, network errors + HTTP 5xx) so a temporary network glitch no longer loses an entire page of images; 7 new unit tests added for page-fetch retry (26 total). Reused the existing `DOWNLOAD_MAX_RETRIES` / `DOWNLOAD_RETRY_DELAY_SECONDS` constants; `fetch_page()` signature and return value unchanged | Boss approved adding retry to `fetch_page()` for page-level resilience; OQ-008 now covers both image downloads and page fetching | scraper_core.py (`fetch_page()` only), tests/test_scraper_core.py, docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 26 tests OK (0.038s, offline); HTTP 4xx verified to fail immediately with no retry; no tkinter/threading/brand-folder changes |
 | 2026-09-27 | TC-002: Retry mechanism for image downloads (3 retries, 2s wait, network errors + HTTP 5xx) + 19 automated unit tests for core logic; OQ-006 and OQ-008 marked Implemented | PM (Mo-Mo) + Boss approved TC-002; answers to OQ-006 (tests = YES) and OQ-008 (retry = YES) | scraper_core.py, tests/test_scraper_core.py (new), docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 19 tests OK; no tkinter/threading changes; brand mapping unchanged (asserted by tests) |
 | 2026-09-27 | Docs cleanup: Single Build decision recorded as ADR-006 (resolved numbering conflict), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed | PM order: documentation must reflect absolute truth; Boss approved ADR-006 renumbering | docs/WINDOWS_COMPATIBILITY.md, docs/04_DECISIONS.md, docs/CHANGELOG.md, docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, docs/HANDOFF.md | Committed + pushed to main |
@@ -273,7 +275,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 > 
 > **Critical technical detail**: Threading model — main thread (tkinter), background thread (daemon), worker pool (ThreadPoolExecutor max 4). **All UI access must go through `root.after()`** from background threads.
 > 
-> **Open questions**: OQ-006 (automated tests) and OQ-008 (retry logic) are **Implemented** (TC-002). OQ-007 (alternative brand folder strategy) still needs owner input in `docs/OPEN_QUESTIONS.md`.
+> **Open questions**: none open. OQ-006 (automated tests) and OQ-008 (retry logic) are **Implemented** (TC-002). OQ-007 (alternative brand folder strategy) is **Deferred** as of 2026-09-28 — the existing structure is kept per ADR-002.
 > 
 > **Tests**: `python -m unittest discover tests` (26 tests, offline, stdlib only). UI and threading are still verified manually.
 > 
