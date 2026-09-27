@@ -2,11 +2,20 @@
 
 ## Task ID and title
 
-TC-005: Simplify Build — Remove Separate Win7/Win10 Builds (Single Build for All Windows)
+TC-005 + Final Documentation Polish — fix architecture stale claims, deduplicate REPOSITORY_AUDIT.md, close flagged docs issues
 
 ## Status
 
-**Completed** (2026-09-27) — 4 build files deleted + docs/requirements updated; commit + push to main
+**Completed** (2026-09-27) — TC-005 done (4 build files deleted + docs/requirements updated; commit + push to main).
+
+**Final Documentation Polish completed** (2026-09-27, Boss approved) — all remaining audit findings fixed:
+- docs/02_ARCHITECTURE.md: stale hardcoded-path claim replaced with the truth (clean relative paths); ADR-006 added to the Architecture Decisions reference list
+- docs/REPOSITORY_AUDIT.md: accidental duplicate half deleted — one clean copy remains
+- Flagged docs issues (hardcoded paths, ADR conflict) marked RESOLVED below
+
+**Repository state**: fully clean, fully documented, no known stale claims remaining. Ready for core feature work.
+
+**Next task**: **TC-002 — Retry Mechanism + Automated Tests** (ready to start).
 
 ## Goal
 
@@ -39,13 +48,16 @@ Simplify to ONE build approach: Python 3.8.10 supports Windows 7, 10, AND 11, so
 - [x] README.md Windows Compatibility section replaced; no dangling build_win7/build_win10 references
 - [x] docs/HANDOFF.md free of "separate builds" mentions; Inno Setup hardcoded-paths Known Issue removed
 - [x] docs/CHANGELOG.md has [2.0.1] entry
-- [ ] `git status` shows only intended files; commit + push to main succeeds
+- [x] `git status` shows only intended files; commit + push to main succeeds
 
-## Open items flagged (outside this task's scope)
+## Flagged issues — RESOLVED / CLOSED (2026-09-27, Boss approved final docs polish)
 
-- docs/04_DECISIONS.md already uses ADR-005 for "MIT License & Clean Slate Portfolio", but the new docs/WINDOWS_COMPATIBILITY.md labels the single-build decision as ADR-005 — numbering conflict needs owner decision (e.g., renumber to ADR-006)
-- docs/CHANGELOG.md [Unreleased] entry dated 2026-09-27 still lists the deleted files under "Added" (stale)
-- docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, and HANDOFF "For Owner" item 4 still claim Create Installer.iss has hardcoded paths (verified fixed — stale docs)
+- [x] **RESOLVED** — ADR numbering conflict: single-build decision recorded as **ADR-006** ("Single Build for All Windows Versions", Accepted) in docs/04_DECISIONS.md, docs/WINDOWS_COMPATIBILITY.md, docs/02_ARCHITECTURE.md, and docs/HANDOFF.md
+- [x] **RESOLVED** — docs/CHANGELOG.md stale "separate builds" / deleted-files entries removed in the previous docs-cleanup commit
+- [x] **RESOLVED** — hardcoded-path claims removed from docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, docs/HANDOFF.md, and docs/02_ARCHITECTURE.md (Create Installer.iss verified to use clean relative paths)
+- [x] **RESOLVED** — docs/REPOSITORY_AUDIT.md accidental duplicate copy (former lines ~191–369) deleted; one clean copy remains
+
+**No open documentation issues remain.**
 
 ## Environment check result (2026-09-27)
 

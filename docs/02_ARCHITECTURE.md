@@ -242,7 +242,7 @@ Output: `dist\Key_Scraper\` (contains Key_Scraper.exe + _internal/ folder with b
 - **Output**: Key_Scraper_Setup.exe (LZMA compression, solid compression enabled)
 - **Install location**: {autopf}\Key Scraper (Program Files)
 - **Options**: Modern wizard style, desktop icon option (unchecked by default), admin privileges required
-- **Source path in script**: D:\Google Drive\[Shop] DRKMTTR Studio\[สมศรี Agent]\Key Scraper 2.0\ (local path — needs updating for other machines)
+- **Source path in script**: Uses clean relative paths (e.g., dist\onedir\Key Scraper 2.0\*).
 
 ### Existing Build Artifacts (verified on disk)
 - `dist\onedir\Key Scraper 2.0\Key_Scraper.exe` (~7.8 MB)
@@ -270,6 +270,7 @@ See `docs/04_DECISIONS.md` for recorded decisions:
 - **ADR-003**: Custom gradient UI via PIL (Implemented)
 - **ADR-004**: PyInstaller --onedir + Inno Setup (Implemented)
 - **ADR-005**: MIT License & Clean Slate Portfolio (Accepted)
+- **ADR-006**: Single Build for All Windows Versions (Accepted)
 
 ---
 
