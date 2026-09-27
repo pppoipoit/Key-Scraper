@@ -81,6 +81,23 @@ python -m PyInstaller --noconsole --onedir --icon=icon.ico --name Key_Scraper ma
 # Then open Create Installer.iss in Inno Setup to compile Key_Scraper_Setup.exe
 ```
 
+> 💡 Use `build_win7.bat` or `build_win10.bat` for version-specific builds (see below).
+
+---
+
+## 💻 Windows Compatibility
+
+| Windows Version | Supported | Python Required | Build Script      |
+| --------------- | --------- | --------------- | ----------------- |
+| Windows 7       | ⚠️ Legacy  | Python 3.8 ONLY | `build_win7.bat`  |
+| Windows 8/8.1   | ⚠️ Legacy  | Python 3.8 ONLY | `build_win7.bat`  |
+| Windows 10      | ✅ Yes     | Python 3.8+     | `build_win10.bat` |
+| Windows 11      | ✅ Yes     | Python 3.8+     | `build_win10.bat` |
+
+**Important:** Python 3.9+ does NOT support Windows 7. If you need Windows 7 support, install Python 3.8.x.
+
+Full details: [docs/WINDOWS_COMPATIBILITY.md](docs/WINDOWS_COMPATIBILITY.md)
+
 ---
 
 ## 📜 License

@@ -1,0 +1,5 @@
+# Windows 7 / 8 build dependencies (Python 3.8 ONLY)
+# Pillow must stay <= 9.5.0 — newer Pillow dropped Windows 7 support
+requests>=2.25.0,<3.0.0
+beautifulsoup4>=4.9.0,<5.0.0
+Pillow>=8.0.0,<=9.5.0

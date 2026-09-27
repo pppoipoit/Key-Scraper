@@ -18,6 +18,17 @@
 
 ---
 
+## [Unreleased] - Windows Compatibility Setup - 2026-09-27
+
+### Added
+
+- Windows compatibility matrix documentation (`docs/WINDOWS_COMPATIBILITY.md`)
+- Separate requirements files for Windows 7 and Windows 10/11 (`requirements-win7.txt`, `requirements-win10.txt`)
+- Build scripts for each Windows version (`build_win7.bat`, `build_win10.bat`)
+- Updated README with compatibility information
+
+---
+
 ## [2.0.0] - 2026-06-23
 
 (จาก README.txt — เป็นเวอร์ชันปัจจุบันใน repository)

@@ -2,46 +2,58 @@
 
 ## Task ID and title
 
-TC-003: Docs — Add MIT License and Clean Slate Status to Handoff Docs
+TC-004: Windows Compatibility Matrix + Multi-Version Build Setup
 
 ## Status
 
-**Completed** (2026-09-23) — edits done, validated docs-only; committing + pushing next
+**Completed** (2026-09-27) — docs/config only; committing + pushing next
 
 ## Goal
 
-Update Markdown documentation only so it matches repository reality: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio), Clean Slate push 49c344d COMPLETE, GitHub Portfolio Setup COMPLETE, Release v2.0.0 still pending owner manual publish.
+Document exactly which Python version supports which Windows version, and provide separate build configurations (requirements + build scripts) for Windows 7/8 vs Windows 10/11 — without touching any source code.
 
 ## Scope
 
-- docs/HANDOFF.md: License section + Recent changes rows (docs update + Release pending) + Completed Portfolio Setup state + ADR-005 row
-- docs/02_ARCHITECTURE.md: Repository Structure note for root LICENSE (MIT) + .gitignore + ADR-005 reference
-- docs/04_DECISIONS.md: New ADR-005 record (MIT License & Clean Slate Portfolio, Accepted)
-- docs/CURRENT_TASK.md: This file (required by 04-documentation-and-handoff workflow)
-- Commit + push with message: "📝 Docs: add MIT License and Clean Slate status to handoff docs"
+- docs/WINDOWS_COMPATIBILITY.md (new): Python/Windows matrix, library compatibility, build matrix
+- requirements-win7.txt (new): requests>=2.25.0,<3.0.0, beautifulsoup4>=4.9.0,<5.0.0, Pillow>=8.0.0,<=9.5.0
+- requirements-win10.txt (new): requests>=2.28.0, beautifulsoup4>=4.12.0, Pillow>=10.0.0
+- build_win7.bat (new) + build_win10.bat (new): PyInstaller build scripts per target
+- README.md: new "💻 Windows Compatibility" section
+- docs/HANDOFF.md: Project Snapshot note + Known Limitation #11 + Multi-version builds under Build Artifacts
+- docs/CHANGELOG.md: [Unreleased] Windows Compatibility Setup entry
+- docs/CURRENT_TASK.md: this file
+- Commit + push with message: "📝 Docs: Add Windows compatibility matrix + multi-version build setup"
 
 ## Non-goals
 
 - No .py changes (scraper_core.py, app.py, main.py, gradient_widgets.py, theme.py untouched)
 - No Korean folder-name or ADR-002 brand-logic changes
-- No LICENSE / .gitignore / README content changes
-- No git tag creation, no GitHub Release creation (owner manual step)
+- No threading model changes
+- No changes to original requirements.txt
+- No new dependencies
 
 ## Acceptance criteria
 
-- [x] HANDOFF states MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio)
-- [x] HANDOFF Recent changes includes Clean Slate push 49c344d + Release v2.0.0 pending
-- [x] HANDOFF Product State marks GitHub Portfolio Setup COMPLETE
-- [x] ARCHITECTURE Repository Structure mentions LICENSE (MIT) + .gitignore
-- [x] DECISIONS contains ADR-005 (Context/Decision/Status Accepted)
-- [ ] `git status` shows only the 4 markdown files above; commit + push to main succeeds
+- [x] Environment checked: Python 3.8.10 (Win7-compatible — NO 3.9+ warning needed)
+- [x] docs/WINDOWS_COMPATIBILITY.md contains the compatibility matrix
+- [x] requirements-win7.txt and requirements-win10.txt created with specified pins
+- [x] build_win7.bat and build_win10.bat created
+- [x] README.md has Windows Compatibility section
+- [x] HANDOFF.md updated (Snapshot, Known Limitations, Build Artifacts)
+- [x] CHANGELOG.md has [Unreleased] entry
+- [ ] `git status` shows only docs/config files; commit + push to main succeeds
+
+## Environment check result (2026-09-27)
+
+- `python --version` → **Python 3.8.10** (Windows 7-compatible ✅ — no Win7 build warning required)
+- `pip list` → requests / beautifulsoup4 / Pillow **NOT installed** in machine environment; PyInstaller 6.22.3 present. Build scripts install deps via requirements files.
 
 ## Work log
 
-- Verified: root LICENSE = MIT (Copyright (c) 2026 pppoipoit x DRKMTTR Studio); .gitignore tracked; history = b2288c6 + 49c344d; `git tag --list` empty (Release v2.0.0 NOT published)
-- Updated HANDOFF (License section, Portfolio Setup COMPLETE, 2 new Recent-changes rows, ADR-005 row)
-- Updated 02_ARCHITECTURE (LICENSE + .gitignore in tree, ADR-005 reference)
-- Updated 04_DECISIONS (ADR-005 record)
+- Read core docs (HANDOFF, CURRENT_TASK, DECISIONS, PROJECT_COMMANDS, README) per .clinerules/00-core-workflow
+- Created WINDOWS_COMPATIBILITY.md, requirements-win7.txt, requirements-win10.txt, build_win7.bat, build_win10.bat
+- Updated README.md, HANDOFF.md, CHANGELOG.md
+- Validated: git status shows only intended files; no .py modifications
 
 ---
 

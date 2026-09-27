@@ -1,6 +1,6 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-23 — TC-003 docs update (MIT License + Clean Slate status), pending commit + push to main
+**Last updated**: 2026-09-27 — TC-004 Windows compatibility matrix + multi-version build setup (docs/config only), pending commit + push to main
 **Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
 **Owner**: DRKMTTR Studio (Tokenmee)
 
@@ -37,6 +37,10 @@ Pillow
 
 ### No database, no auth, no external services
 **Verified**: The application makes HTTP requests only to user-provided URLs. No API keys, no database, no user accounts, no configuration files.
+
+### Windows 7 legacy support — documented 2026-09-27
+**Fact**: Windows 7/8 users MUST run Python 3.8.x (Python 3.9+ dropped Windows 7 support). Separate build configs exist: `requirements-win7.txt` + `build_win7.bat` (Pillow pinned `<=9.5.0`) and `requirements-win10.txt` + `build_win10.bat`. PyInstaller builds must match the target Python version. See `docs/WINDOWS_COMPATIBILITY.md` for the full matrix.
+
 
 ## Current Product State
 
@@ -79,6 +83,8 @@ Pillow
 8. **Windows-specific icon** — icon.ico may not display on Linux/macOS
 9. **No log file** — logs are in-memory only, lost on close
 10. **No persistent config** — folder path not saved between sessions
+11. **Windows 7 requires Python 3.8.x only** — Python 3.9+ builds will not run on Windows 7; Win7 builds must use `build_win7.bat` with `requirements-win7.txt` (Pillow `<=9.5.0`)
+
 
 ## Documentation Status
 
@@ -106,7 +112,9 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
-| 2026-09-23 | Docs: added MIT License + Clean Slate status to HANDOFF / ARCHITECTURE / DECISIONS (ADR-005) — no source-code changes | PM request: documentation must match reality (LICENSE, 49c344d, Release v2.0.0 pending) | docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/04_DECISIONS.md (+ docs/CURRENT_TASK.md, docs/CHANGELOG.md bookkeeping) | Pending: commit + push to main |
+| 2026-09-27 | Docs/build config: Windows compatibility matrix + separate requirements + build scripts (no .py changes) | PM (Mo-Mo) request: document which Python supports which Windows; separate Win7/Win10 builds | docs/WINDOWS_COMPATIBILITY.md (new), requirements-win7.txt (new), requirements-win10.txt (new), build_win7.bat (new), build_win10.bat (new), README.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md | Verified: Python 3.8.10 on build machine; `git status` shows only docs/config files; pending commit + push |
+| 2026-09-23 | Docs: added MIT License + Clean Slate status to HANDOFF / ARCHITECTURE / DECISIONS (ADR-005) — no source-code changes | PM request: documentation must match reality (LICENSE, 49c344d, Release v2.0.0 pending) | docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/04_DECISIONS.md (+ docs/CURRENT_TASK.md, docs/CHANGELOG.md bookkeeping) | Committed in 78e6766 |
+
 | 2026-09-23 | GitHub Release v2.0.0 — PENDING owner manual publish (no tags in repo; `gh` CLI not installed) | Clean Slate code already on origin main; Release page not yet created | Tag `v2.0.0` (to be created) + Release notes in docs/CHANGELOG.md | `git tag --list` = empty; publish at https://github.com/pppoipoit/Key-Scraper/releases/new |
 | 2026-09-23 | TC-002 Clean Slate push: fresh repo, single commit 49c344d, force-pushed to origin main | Boss-approved portfolio-ready history | 49 files in one root commit (no .py / README / LICENSE / .gitignore content changes) | git push forced update 25511f9...49c344d; git status clean |
 | 2026-09-14 | Bootstrap AI workflow docs | Owner request: setup AI-assisted workflow | .clinerules/*, docs/* (หลายไฟล์) | ยังทำไม่เสร็จ ต้องตรวจต่อ |
@@ -154,6 +162,15 @@ Pillow
 |------|------|----------|
 | Key_Scraper.exe | ~7.8 MB | dist/onedir/Key Scraper 2.0/ |
 | Key_Scraper_Setup.exe | ~29.3 MB | dist/installer/ |
+
+### Multi-version builds (added 2026-09-27)
+Separate builds per target Windows version (see `docs/WINDOWS_COMPATIBILITY.md`):
+
+| Target | Build Script | Requirements | Output |
+|--------|--------------|--------------|--------|
+| Windows 7/8 (Python 3.8 ONLY) | `build_win7.bat` | `requirements-win7.txt` (Pillow `<=9.5.0`) | `dist\Key_Scraper_Win7\` |
+| Windows 10/11 (Python 3.8+) | `build_win10.bat` | `requirements-win10.txt` | `dist\Key_Scraper_Win10\` |
+
 
 ## Architecture Decisions
 
@@ -255,7 +272,8 @@ Pillow
 
 ## Last Updated
 
-2026-09-23 — TC-003 in progress: HANDOFF/ARCHITECTURE/DECISIONS/CURRENT_TASK updated with MIT License + Clean Slate status (docs-only, no .py changes), pending commit + push to main
+2026-09-27 — TC-004: Windows compatibility matrix + multi-version build setup (docs/WINDOWS_COMPATIBILITY.md, requirements-win7.txt, requirements-win10.txt, build_win7.bat, build_win10.bat, README.md, HANDOFF.md, CHANGELOG.md, CURRENT_TASK.md) — docs/config only, no .py changes, pending commit + push to main
+- **Environment**: Python 3.8.10 on build machine (Windows 7-compatible); requests/beautifulsoup4/Pillow not installed machine-wide
 - **License**: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) — root LICENSE, tracked in git
 - **GitHub Portfolio Setup**: COMPLETE (Clean Slate 49c344d pushed); Release v2.0.0 tag + page still pending owner manual publish
 - **No authentication**: Single-user desktop app
