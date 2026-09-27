@@ -6,6 +6,9 @@
 
 ### Added
 
+- Retry mechanism for failed image downloads in `scraper_core.py` — network timeouts, connection errors, and HTTP 5xx are retried up to 3 times (2-second wait between attempts) inside the existing background worker thread. Permanent failures (e.g. HTTP 4xx) are logged and skipped without retry, as before (TC-002 / OQ-008)
+- Automated unit tests for the core logic in `tests/test_scraper_core.py` — 19 tests covering brand detection (ADR-002 compliance), Korean folder names, URL joining, and retry behaviour. Run with `python -m unittest discover tests`; uses the standard-library `unittest` only and performs no network access (TC-002 / OQ-006)
+
 ### Changed
 
 ### Fixed

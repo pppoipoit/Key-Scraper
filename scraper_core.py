@@ -11,6 +11,7 @@ Logic การ scrape/ดาวน์โหลดรูปทั้งหมด
 """
 
 import os
+import time
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -19,6 +20,12 @@ PAGE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36"
 }
 IMAGE_HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+# Retry สำหรับการดาวน์โหลดรูป (TC-002 / OQ-008)
+# ถ้าเจอ network error (timeout/connection) หรือ HTTP 5xx ให้รอแล้วลองใหม่
+# สูงสุด 3 ครั้ง (รวม attempt แรก = 4 ครั้ง) ห่างกันครั้งละ 2 วินาที
+DOWNLOAD_MAX_RETRIES = 3
+DOWNLOAD_RETRY_DELAY_SECONDS = 2
 
 # ชื่อโฟลเดอร์ปลายทาง - คัดลอกมาจากต้นฉบับทุกตัวอักษร ห้ามแก้!
 FOLDER_LAYOUT = "รูปตัวอย่างแผง Keyboard [Layout]"
@@ -60,24 +67,49 @@ def get_brand_name(model_name):
 
 
 def download_image(url, folder, filename, log_callback=None):
-    """ดาวน์โหลดรูปเดียว (logic เดิมทุกจุด: stream, header, นามสกุลไฟล์, chunk 1024)"""
+    """ดาวน์โหลดรูปเดียว (logic เดิมทุกจุด: stream, header, นามสกุลไฟล์, chunk 1024)
+    + Retry (TC-002 / OQ-008): ถ้าเจอ network error (timeout/connection) หรือ HTTP 5xx
+    จะรอ DOWNLOAD_RETRY_DELAY_SECONDS แล้วลองใหม่ สูงสุด DOWNLOAD_MAX_RETRIES ครั้ง
+    ก่อน log ว่าเป็น failure แล้วผ่านไป
+    *** ฟังก์ชันนี้ถูกเรียกจาก worker thread ของ ThreadPoolExecutor เท่านั้น
+        ดังนั้น time.sleep() ในนี้ปลอดภัย ไม่กระทบ UI thread (ห้ามเรียกจาก main thread) ***"""
     if not url:
         return False
-    try:
-        res = requests.get(url, stream=True, headers=IMAGE_HEADERS)
-        if res.status_code == 200:
-            ext = url.split(".")[-1].split("?")[0].lower()
-            if len(ext) > 4 or not ext:
-                ext = "jpg"
 
-            file_path = os.path.join(folder, f"{filename}.{ext}")
-            with open(file_path, "wb") as f:
-                for chunk in res.iter_content(1024):
-                    f.write(chunk)
-            return True
-    except Exception as e:
-        if log_callback:
-            log_callback(f"Error downloading: {filename} | {e}")
+    last_error = ""
+    for attempt in range(DOWNLOAD_MAX_RETRIES + 1):
+        try:
+            res = requests.get(url, stream=True, headers=IMAGE_HEADERS)
+            if res.status_code == 200:
+                ext = url.split(".")[-1].split("?")[0].lower()
+                if len(ext) > 4 or not ext:
+                    ext = "jpg"
+
+                file_path = os.path.join(folder, f"{filename}.{ext}")
+                with open(file_path, "wb") as f:
+                    for chunk in res.iter_content(1024):
+                        f.write(chunk)
+                return True
+
+            last_error = f"HTTP {res.status_code}"
+            if res.status_code < 500:
+                break  # 4xx/status อื่นที่ไม่ใช่ 5xx: retry ไม่ช่วย -> log แล้วผ่านไป
+        except requests.exceptions.RequestException as e:
+            last_error = str(e)  # timeout / connection error -> retry ได้
+        except Exception as e:
+            last_error = str(e)
+            break  # error อื่น (เช่น เขียนไฟล์ไม่ได้) retry ไม่ช่วย
+
+        if attempt < DOWNLOAD_MAX_RETRIES:
+            if log_callback:
+                log_callback(
+                    f"Retry {attempt + 1}/{DOWNLOAD_MAX_RETRIES} in "
+                    f"{DOWNLOAD_RETRY_DELAY_SECONDS}s: {filename} | {last_error}"
+                )
+            time.sleep(DOWNLOAD_RETRY_DELAY_SECONDS)
+
+    if log_callback:
+        log_callback(f"Error downloading: {filename} | {last_error}")
     return False
 
 

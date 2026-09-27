@@ -89,9 +89,31 @@ Output: `dist\main.exe` (or `dist\Key_Scraper.exe` with `--name`)
 - `dist\onedir\Key Scraper 2.0\Key_Scraper.exe` — 7,798,521 bytes (~7.8 MB)
 - `dist\installer\Key_Scraper_Setup.exe` — 29,311,454 bytes (~29.3 MB)
 
+## Run Automated Tests — Added in TC-002 (2026-09-27)
+
+Run from the project root folder:
+```bash
+python -m unittest discover tests
+```
+Expected: `Ran 19 tests ... OK` (about 0.02s, no internet needed — all HTTP calls are mocked).
+
+Verbose output:
+```bash
+python -m unittest discover tests -v
+```
+
+**What is covered** (`tests/test_scraper_core.py`):
+- `get_brand_name()` — brand detection mapping (ADR-002 compliance check)
+- `FOLDER_*` constants + `build_brand_folders()` — Korean folder names and path structure
+- `extract_keyboard_image_url()` — URL joining
+- `get_detail_rows()` — header row filtering
+- `download_image()` — retry behaviour (5xx / connection errors / 4xx / empty URL)
+
+**Not covered** (still manual): the tkinter UI, the threading model, and anything that needs a real website. Use the manual tests below for those.
+
 ## Manual Testing — Verified Steps
 
-Since there are no automated tests, perform these manual tests:
+Automated tests cover the core logic only. The UI flows below still require manual testing:
 
 ### Test 1: Application Launch
 1. Run `python main.py`

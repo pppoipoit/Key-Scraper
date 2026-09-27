@@ -1,6 +1,6 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-27 — Docs cleanup: Single Build decision renumbered to ADR-006 (Boss approved), stale CHANGELOG "separate builds" entries deleted, hardcoded-path warnings removed from PROJECT_COMMANDS / REPOSITORY_AUDIT / HANDOFF — commit + push to main
+**Last updated**: 2026-09-27 — TC-002: retry mechanism for image downloads + automated unit tests for core logic added (OQ-006, OQ-008 now Implemented) — commit + push to main
 **Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
 **Owner**: DRKMTTR Studio (Tokenmee)
 
@@ -52,6 +52,8 @@ Pillow
 - Gradient progress bar (fraction-based, not percentage)
 - Scrollable log panel with live updates
 - Image downloads saved to structured folders
+- **Retry on failed downloads (TC-002)**: network errors (timeout/connection) and HTTP 5xx are retried up to 3 times with a 2-second wait, running inside the background worker thread only; permanent failures (e.g. HTTP 4xx) are logged and skipped
+- **Automated unit tests for core logic (TC-002)**: 19 tests in `tests/test_scraper_core.py` covering brand detection (ADR-002), Korean folder names, URL joining, row filtering and retry behaviour — run with `python -m unittest discover tests` (no network needed, no new dependencies)
 - Thread-safe UI updates via `root.after()`
 - Custom gradient/rounded widgets (PIL-rendered)
 - Build system produces `Key_Scraper.exe` and `Key_Scraper_Setup.exe`
@@ -68,14 +70,14 @@ Pillow
 - **Portfolio hygiene COMPLETE**: Root `.gitignore` present and tracked — excludes `dist/`, `build/`, `*.exe`, Python cache, IDE/OS junk. No build artifacts committed after clean slate.
 
 ### ❌ Not Started
-- Automated test suite (none exists)
+- Automated test suite for the UI / threading model (unit tests cover the core logic only)
 - Product context documentation completion (awaiting owner input on open questions)
 - Any feature enhancements beyond documentation
 
 ### Known Limitations — Verified from Code
-1. **No automated tests** — all testing is manual
+1. **Automated tests cover core logic only** — brand detection, folder structure, URL joining and retry are tested (`tests/test_scraper_core.py`); the UI and threading model are still tested manually
 2. **Brand detection** is prefix-based (`get_brand_name()` in scraper_core.py) — may misclassify unusual model names
-3. **No retry** for failed image downloads — logged but not retried
+3. **Retry is fixed, not configurable** — 3 retries / 2-second wait hardcoded as `DOWNLOAD_MAX_RETRIES` and `DOWNLOAD_RETRY_DELAY_SECONDS`; HTTP 4xx responses are not retried (they fail immediately)
 4. **No rate limiting** — requests sent as fast as ThreadPoolExecutor allows
 5. **Fixed window size** 980×600, non-resizable (theme.py)
 6. **Target site dependency** — relies on specific HTML structure (`div.keyboar_wrap`, `div.detail_row`, `div.f_box`)
@@ -96,7 +98,7 @@ Pillow
 - **Root README.md**: Updated with AI-Assisted Development Workflow section
 
 ### ⏳ Pending Owner Input
-- **OPEN_QUESTIONS.md**: 8 open questions (OQ-001 to OQ-008) covering target sites, configurability, logging, cross-platform, testing, brand detection, retry logic
+- **OPEN_QUESTIONS.md**: OQ-006 (automated tests) and OQ-008 (retry logic) are now **Implemented** (TC-002, 2026-09-27). OQ-007 (alternative brand folder strategy) still needs owner input; OQ-001 to OQ-005 have owner answers recorded.
 - What remains:
   - สร้าง HANDOFF.md (นี่แหละ), QA_CHECKLIST.md, GLOSSARY.md, CHANGELOG.md, OPEN_QUESTIONS.md, PROJECT_COMMANDS.md
   - สร้าง docs/workflows/ ทั้ง 6 ไฟล์
@@ -112,6 +114,7 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
+| 2026-09-27 | TC-002: Retry mechanism for image downloads (3 retries, 2s wait, network errors + HTTP 5xx) + 19 automated unit tests for core logic; OQ-006 and OQ-008 marked Implemented | PM (Mo-Mo) + Boss approved TC-002; answers to OQ-006 (tests = YES) and OQ-008 (retry = YES) | scraper_core.py, tests/test_scraper_core.py (new), docs/OPEN_QUESTIONS.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md, docs/PROJECT_COMMANDS.md, docs/QA_CHECKLIST.md | `python -m unittest discover tests` → 19 tests OK; no tkinter/threading changes; brand mapping unchanged (asserted by tests) |
 | 2026-09-27 | Docs cleanup: Single Build decision recorded as ADR-006 (resolved numbering conflict), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed | PM order: documentation must reflect absolute truth; Boss approved ADR-006 renumbering | docs/WINDOWS_COMPATIBILITY.md, docs/04_DECISIONS.md, docs/CHANGELOG.md, docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, docs/HANDOFF.md | Committed + pushed to main |
 | 2026-09-27 | Simplified build: removed separate Win7/Win10 scripts, single build for all Windows | Boss decision | requirements.txt, docs/ | Pushed to GitHub (2e9a4b4) |
 | 2026-09-23 | Docs: added MIT License + Clean Slate status to HANDOFF / ARCHITECTURE / DECISIONS (ADR-005) — no source-code changes | PM request: documentation must match reality (LICENSE, 49c344d, Release v2.0.0 pending) | docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/04_DECISIONS.md (+ docs/CURRENT_TASK.md, docs/CHANGELOG.md bookkeeping) | Committed in 78e6766 |
@@ -134,7 +137,7 @@ Pillow
 ตาราง:
 | Severity | Issue | Impact | Workaround | Recommended next action |
 |----------|-------|--------|------------|------------------------|
-| Info | ไม่มี automated test | ต้อง manual test ทุกครั้ง | เขียน manual test steps | เจ้าของตัดสินใจว่าจะทำ test มั้ย |
+| Info | Automated tests ครอบคลุมแค่ core logic | การแก้ส่วน UI / threading ยังต้อง manual test | รัน `python -m unittest discover tests` + ทำตาม manual steps ใน PROJECT_COMMANDS.md | ถ้าจะแก้ UI หรือ threading ควรเพิ่ม test ในรอบถัดไป |
 | Info | ไม่มี product context ครบ | AI อาจทำงานผิด direction | ใส่ [TBD] / [NEEDS OWNER INPUT] จนกว่า owner ตอบ | เจ้าของตอบคำถามใน OPEN_QUESTIONS.md |
 
 ## Folder Structure — Verified (Exact Korean Names)
@@ -205,7 +208,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 | Severity | Issue | Impact | Workaround |
 |----------|-------|--------|------------|
-| Info | No automated tests | Every change requires manual testing | Write manual test steps (see PROJECT_COMMANDS.md) |
+| Info | Automated tests cover core logic only | UI / threading changes still need manual testing | Run `python -m unittest discover tests` first, then follow the manual steps in PROJECT_COMMANDS.md |
 | Info | No log file | Can't debug after app closes | User must screenshot or copy log before closing |
 | Info | Brand detection may misclassify | Wrong brand folder for unusual model names | Acceptable for now; owner can request improvement |
 | Info | No persistent settings | Must re-select folder each session | Acceptable for current use case |
@@ -240,8 +243,8 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 ### For Owner (DRKMTTR Studio / Tokenmee)
 1. Review this handoff for accuracy
-2. Answer open questions in `docs/OPEN_QUESTIONS.md`
-3. Decide whether to add automated tests
+2. Answer the remaining open question in `docs/OPEN_QUESTIONS.md` (OQ-007)
+3. Optionally run the automated tests once to see them work: `python -m unittest discover tests`
 4. Select next task from backlog (or propose new feature)
 
 ---
@@ -250,7 +253,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 > **Project**: LaptopKey Scraper - Elite Edition v2 (Windows desktop GUI, Python/tkinter)
 > 
-> **Current state**: Documentation bootstrap (TC-001) **COMPLETE**. All core docs, workflows, rules, and owner manuals created and populated with verified information from source code. Ready for next task selection.
+> **Current state**: TC-002 **COMPLETE** (2026-09-27) — retry mechanism for image downloads + 19 automated unit tests for the core logic. Documentation, workflows, rules, and owner manuals are populated with verified information from source code. Ready for next task selection.
 > 
 > **Key files to read first**:
 > - `docs/HANDOFF.md` (this file) — current status and next actions
@@ -261,7 +264,9 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 > 
 > **Critical technical detail**: Threading model — main thread (tkinter), background thread (daemon), worker pool (ThreadPoolExecutor max 4). **All UI access must go through `root.after()`** from background threads.
 > 
-> **Open questions blocking next feature work**: 8 questions in `docs/OPEN_QUESTIONS.md` need owner input (target sites, configurability, logging, cross-platform, tests, brand detection, retry logic).
+> **Open questions**: OQ-006 (automated tests) and OQ-008 (retry logic) are **Implemented** (TC-002). OQ-007 (alternative brand folder strategy) still needs owner input in `docs/OPEN_QUESTIONS.md`.
+> 
+> **Tests**: `python -m unittest discover tests` (19 tests, offline, stdlib only). UI and threading are still verified manually.
 > 
 > **No secrets, no database, no auth** — verified clean repository.
 > 
@@ -271,9 +276,10 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 ## Last Updated
 
+2026-09-27 — TC-002: retry mechanism added to `download_image()` (3 retries, 2s wait, network errors + HTTP 5xx, worker thread only) + new `tests/test_scraper_core.py` (19 tests, stdlib unittest, all HTTP mocked); OQ-006 / OQ-008 marked Implemented; docs updated (OPEN_QUESTIONS, HANDOFF, CHANGELOG, CURRENT_TASK, PROJECT_COMMANDS, QA_CHECKLIST) — only .py change is scraper_core.py, committed + pushed to main
 2026-09-27 — Docs cleanup: ADR conflict resolved (Single Build recorded as ADR-006 in 04_DECISIONS.md + WINDOWS_COMPATIBILITY.md), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed from PROJECT_COMMANDS.md / REPOSITORY_AUDIT.md / HANDOFF.md — .md files only, no .py changes, committed + pushed to main
 2026-09-27 — TC-005: Simplify build — deleted build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt; single requirements.txt with Pillow<=9.5.0; updated docs/WINDOWS_COMPATIBILITY.md, README.md, HANDOFF.md, CHANGELOG.md, CURRENT_TASK.md — docs/config only, no .py changes, committed + pushed to main
-- **Environment**: Python 3.8.10 on build machine (Windows 7-compatible); requests/beautifulsoup4/Pillow not installed machine-wide
+- **Environment**: Python 3.8.10 on build machine (Windows 7-compatible); requests/beautifulsoup4/Pillow installed on 2026-09-27 via `pip install -r requirements.txt` (needed to run the test suite)
 - **License**: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) — root LICENSE, tracked in git
 - **GitHub Portfolio Setup**: COMPLETE (Clean Slate 49c344d pushed); Release v2.0.0 tag + page still pending owner manual publish
 - **No authentication**: Single-user desktop app

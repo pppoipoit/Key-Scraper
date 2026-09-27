@@ -10,7 +10,7 @@
 - [x] Permission/role behavior ถูกต้อง (N/A — ไม่มี auth)
 - [ ] Input validation ถูกต้อง (ตรวจว่ามี URL และ folder ก่อนเริ่ม)
 - [ ] ไม่มี secret หรือข้อมูลส่วนตัวใน code/log/docs (ตรวจแล้ว)
-- [ ] Test/lint/typecheck/build รันแล้ว หรืออธิบายว่าทำไมรันไม่ได้ (ไม่มี test/lint อยู่ — manual test only)
+- [x] Test/lint/typecheck/build รันแล้ว หรืออธิบายว่าทำไมรันไม่ได้ (automated: `python -m unittest discover tests` → 19 tests OK เมื่อ 2026-09-27 / ไม่มี linter และ type checker ในโปรเจกต์นี้)
 - [x] Manual test steps ถูกเขียนให้ non-developer ทำตามได้ (ดูส่วนท้ายของไฟล์นี้)
 - [ ] Documentation/Handoff ถูกอัปเดต (กำลังทำ)
 - [x] ไม่มี change นอก scope โดยไม่อนุมัติ

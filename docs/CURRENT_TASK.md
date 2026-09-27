@@ -2,53 +2,51 @@
 
 ## Task ID and title
 
-TC-005 + Final Documentation Polish — fix architecture stale claims, deduplicate REPOSITORY_AUDIT.md, close flagged docs issues
+TC-002 — Implement Retry Mechanism & Automated Tests for scraper_core.py
 
 ## Status
 
-**Completed** (2026-09-27) — TC-005 done (4 build files deleted + docs/requirements updated; commit + push to main).
+**Completed** (2026-09-27) — retry implemented in `download_image()`, 19 unit tests added and passing (`python -m unittest discover tests`), docs updated, committed + pushed to main.
 
-**Final Documentation Polish completed** (2026-09-27, Boss approved) — all remaining audit findings fixed:
-- docs/02_ARCHITECTURE.md: stale hardcoded-path claim replaced with the truth (clean relative paths); ADR-006 added to the Architecture Decisions reference list
-- docs/REPOSITORY_AUDIT.md: accidental duplicate half deleted — one clean copy remains
-- Flagged docs issues (hardcoded paths, ADR conflict) marked RESOLVED below
+**Repository state**: core scraping logic now retries transient download failures, and the pure core logic has automated test coverage. `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched (PM constraint).
 
-**Repository state**: fully clean, fully documented, no known stale claims remaining. Ready for core feature work.
-
-**Next task**: **TC-002 — Retry Mechanism + Automated Tests** (ready to start).
+**Next task**: none queued — owner picks the next item (OQ-007 still needs owner input; see `docs/OPEN_QUESTIONS.md` and `docs/05_BACKLOG.md`).
 
 ## Goal
 
-Simplify to ONE build approach: Python 3.8.10 supports Windows 7, 10, AND 11, so remove the separate Win7/Win10 build scripts and requirements files, pin Pillow in the single `requirements.txt`, and update all documentation to reflect the single-build approach — without touching any source code.
+Answer OQ-006 (automated tests) and OQ-008 (retry logic): make image downloads resilient to transient network / HTTP 5xx failures, and add a dependency-free `unittest` suite covering the pure logic in `scraper_core.py`.
 
 ## Scope
 
-- Delete: `build_win7.bat`, `build_win10.bat`, `requirements-win7.txt`, `requirements-win10.txt`
-- `requirements.txt` (single file): requests, beautifulsoup4, Pillow<=9.5.0
-- docs/WINDOWS_COMPATIBILITY.md: replaced with simplified single-build version
-- README.md: "💻 Windows Compatibility" section replaced with single-build table + build command
-- docs/HANDOFF.md: removed separate-build mentions, removed Inno Setup hardcoded-paths Known Issue (already fixed), added Recent changes row
-- docs/CHANGELOG.md: [2.0.1] entry added
-- docs/CURRENT_TASK.md: this file
-- Commit + push with message: "🧹 Simplify: remove separate Win7/Win10 builds — single build for all Windows (Boss decision)"
+- `scraper_core.py`: added `DOWNLOAD_MAX_RETRIES = 3`, `DOWNLOAD_RETRY_DELAY_SECONDS = 2` and wrapped the download body of `download_image()` in a retry loop
+  - Retries on `requests.exceptions.RequestException` (timeout / connection error) and HTTP 5xx
+  - HTTP 4xx and non-request exceptions fail immediately (retry cannot help)
+  - `time.sleep()` inside the function is safe: the function only ever runs inside a `ThreadPoolExecutor` worker thread (`app.py` → `process_scraping`)
+- New `tests/test_scraper_core.py`: 19 tests, stdlib `unittest` + `unittest.mock` only (no new dependencies)
+  - covers brand detection (ADR-002), Korean folder names, URL joining, `head_row` filtering, retry behaviour
+  - `requests.get` and `time.sleep` are mocked → tests run offline in ~0.02s
+- docs: `OPEN_QUESTIONS.md` (OQ-006 / OQ-008 → Implemented), `HANDOFF.md`, `CHANGELOG.md`, `CURRENT_TASK.md`, `PROJECT_COMMANDS.md`, `QA_CHECKLIST.md`
 
 ## Non-goals
 
-- No .py changes (scraper_core.py, app.py, main.py, gradient_widgets.py, theme.py untouched)
-- No Korean folder-name or ADR-002 brand-logic changes
-- No threading model changes
-- No new dependencies
-- No changes to docs/04_DECISIONS.md (ADR numbering conflict flagged, see below)
+- No changes to `app.py`, `main.py`, `gradient_widgets.py`, `theme.py`
+- No changes to brand detection logic or Korean folder names (ADR-002)
+- No threading model changes; no tkinter import and no `root.after()` in `scraper_core.py` or `tests/`
+- No new dependencies (stdlib `unittest` only)
+- No retry added to `fetch_page()` — a page fetch failure still fails that URL as before (out of scope, would change user-visible behavior)
 
 ## Acceptance criteria
 
-- [x] build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt deleted
-- [x] requirements.txt = requests / beautifulsoup4 / Pillow<=9.5.0
-- [x] docs/WINDOWS_COMPATIBILITY.md replaced with single-build version
-- [x] README.md Windows Compatibility section replaced; no dangling build_win7/build_win10 references
-- [x] docs/HANDOFF.md free of "separate builds" mentions; Inno Setup hardcoded-paths Known Issue removed
-- [x] docs/CHANGELOG.md has [2.0.1] entry
-- [x] `git status` shows only intended files; commit + push to main succeeds
+- [x] `download_image()` retries up to 3 times (4 attempts total) with a 2-second wait on network errors and HTTP 5xx
+- [x] Permanent failures logged as `Error downloading: <filename> | <reason>` and the function returns `False`
+- [x] No tkinter / `root.after()` introduced; retry stays isolated in the background worker thread
+- [x] `tests/test_scraper_core.py` created with stdlib `unittest`, no network access
+- [x] Brand mapping covered by tests (AC→Acer, AS→ASUS, MS→MSI, SG→SAMSUNG, D→DELL, H→HP, L→Lenovo, T→TOSHIBA, A→Apple, unknown→Others)
+- [x] URL joining logic covered by tests
+- [x] `python -m unittest discover tests` passes
+- [x] OQ-006 and OQ-008 status set to Implemented in `docs/OPEN_QUESTIONS.md`
+- [x] `docs/HANDOFF.md` (Current Product State + Recent changes) and `docs/CHANGELOG.md` ([Unreleased]) updated
+- [x] Commit + push to `main` succeeds
 
 ## Flagged issues — RESOLVED / CLOSED (2026-09-27, Boss approved final docs polish)
 
@@ -59,18 +57,30 @@ Simplify to ONE build approach: Python 3.8.10 supports Windows 7, 10, AND 11, so
 
 **No open documentation issues remain.**
 
+## Validation results (2026-09-27)
+
+- `python -m unittest discover tests -v` → **Ran 19 tests ... OK** (0.023s, offline)
+- `python -c "import scraper_core"` → OK (Python 3.8.10; deps installed with the documented `pip install -r requirements.txt`)
+- Lint / typecheck → **Not run** — none configured in this repository (see `docs/PROJECT_COMMANDS.md`)
+- Manual UI test → **Not run in this session** — the retry runs in the background worker thread and changes no UI element; a manual re-check is suggested (steps in `docs/PROJECT_COMMANDS.md`)
+
+## Owner approval
+
+**Approved** — PM (Mo-Mo) and Boss approved TC-002 (retry + automated tests) on 2026-09-27.
+
 ## Environment check result (2026-09-27)
 
-- `python --version` → **Python 3.8.10** (Windows 7-compatible ✅ — no Win7 build warning required)
-- `pip list` → requests / beautifulsoup4 / Pillow **NOT installed** in machine environment; PyInstaller 6.22.3 present. Install deps via `pip install -r requirements.txt` before building.
+- `python --version` → **Python 3.8.10** (Windows 7-compatible ✅)
+- `pip list` → requests / beautifulsoup4 / Pillow were **NOT installed** on this machine (PyInstaller 6.22.3 present). Installed the already-declared dependencies with `pip install -r requirements.txt` so the test suite could import `scraper_core`. **No new dependency was added to `requirements.txt`.**
 
 ## Work log
 
-- Read core docs (HANDOFF, CURRENT_TASK, DECISIONS, PROJECT_COMMANDS) per .clinerules/00-core-workflow
-- Verified `Create Installer.iss` no longer contains hardcoded "Google Drive" paths (Inno Setup limitation truly fixed)
-- Deleted build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt (git rm)
-- Updated requirements.txt (Pillow<=9.5.0), docs/WINDOWS_COMPATIBILITY.md, README.md, docs/HANDOFF.md, docs/CHANGELOG.md, docs/CURRENT_TASK.md
-- Validated: git status/diff shows only intended files; no .py modifications
+- Read core docs (HANDOFF, CURRENT_TASK, DECISIONS, PROJECT_COMMANDS, QA_CHECKLIST, OPEN_QUESTIONS) per `.clinerules/00-core-workflow.md`
+- Verified `download_image()` only ever runs inside the `ThreadPoolExecutor` worker (`app.py` → `process_scraping`), so `time.sleep()` cannot block the UI
+- Added retry constants + retry loop to `download_image()` in `scraper_core.py` (only `.py` file touched)
+- Created `tests/test_scraper_core.py` (19 tests, stdlib `unittest`, all HTTP mocked) — all pass
+- Updated docs: `OPEN_QUESTIONS.md` (OQ-006 / OQ-008 → Implemented), `HANDOFF.md`, `CHANGELOG.md`, `CURRENT_TASK.md`, `PROJECT_COMMANDS.md`, `QA_CHECKLIST.md`
+- Constraint check: `app.py`, `main.py`, `gradient_widgets.py`, `theme.py` untouched; no tkinter import / `root.after()` in `scraper_core.py` or `tests/`; brand mapping and Korean folder names unchanged (asserted by the tests)
 
 ---
 
