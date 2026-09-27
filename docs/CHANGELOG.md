@@ -23,13 +23,11 @@
 ### Added
 
 - Windows compatibility matrix documentation (`docs/WINDOWS_COMPATIBILITY.md`)
-- Separate requirements files for Windows 7 and Windows 10/11 (`requirements-win7.txt`, `requirements-win10.txt`)
-- Build scripts for each Windows version (`build_win7.bat`, `build_win10.bat`)
 - Updated README with compatibility information
 
 ---
 
-## [2.0.1] - 2026-09-23
+## [2.0.1] - 2026-09-27
 
 ### Changed
 

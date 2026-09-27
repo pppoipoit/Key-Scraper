@@ -112,6 +112,18 @@ Template ต่อ decision:
 - Related files/requirements: LICENSE, .gitignore, docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/CHANGELOG.md
 - Owner approval: PM (Mo-Mo) requested docs update 2026-09-23; license holder "pppoipoit x DRKMTTR Studio" per root LICENSE
 
+### ADR-006: Single Build for All Windows Versions
+
+- Date: 2026-09-27
+- Status: Accepted
+- Context: Initially created separate build scripts for Win7/Win10. Boss decided Python 3.8 covers all targets.
+- Decision: Use ONE build script, ONE requirements.txt, ONE build command for all Windows versions.
+- Why: Simpler maintenance, less confusion, fewer files to manage. Python 3.8 natively supports Win 7, 10, and 11.
+- Alternatives considered: Separate requirements and batch scripts per OS version.
+- Consequences: Must maintain Pillow<=9.5.0 in the single requirements.txt to ensure Win7 compatibility.
+- Related files/requirements: requirements.txt, build commands in README.md
+- Owner approval: Boss (pppoipoit) on 2026-09-27
+
 ---
 
 ## Template for new decisions

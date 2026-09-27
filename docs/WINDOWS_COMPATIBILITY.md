@@ -37,11 +37,11 @@ python -m PyInstaller --noconsole --onedir --icon=icon.ico --name "Key_Scraper" 
 
 ## Decision Record
 
-**ADR-005: Single Build for All Windows Versions**
+**ADR-006: Single Build for All Windows Versions**
 
-- Date: 2026-09-23
+- Date: 2026-09-27
 - Status: Accepted
 - Context: Initially created separate build scripts for Win7/Win10. Boss decided Python 3.8 covers all targets.
 - Decision: Use ONE build script, ONE requirements.txt, ONE build command for all Windows versions.
 - Why: Simpler maintenance, less confusion, fewer files to manage.
-- Owner approval: Boss (pppoipoit) on 2026-09-23
+- Owner approval: Boss (pppoipoit) on 2026-09-27

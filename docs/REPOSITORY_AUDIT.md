@@ -120,32 +120,25 @@ python -m PyInstaller --noconsole --onedir --icon=icon.ico main.py
 - Compression: LZMA with solid compression
 - Admin privileges required
 
-### ⚠️ Hardcoded Paths in Create Installer.iss
-```
-D:\Google Drive\[Shop] DRKMTTR Studio\[สมศรี Agent]\Key Scraper 2.0\
-```
-These paths must be updated before compiling on a different machine.
-
 ---
 
 ## Items Requiring Owner Confirmation
 
 ### 🔴 High Priority
-1. **Inno Setup hardcoded paths** — Cannot rebuild installer without updating
-2. **Logo_BK.ico purpose** — Exists but not referenced in code
-3. **Target website(s)** — Need to know which sites the app scrapes
-4. **Whether automated tests are wanted** — Currently none exist
+1. **Logo_BK.ico purpose** — Exists but not referenced in code
+2. **Target website(s)** — Need to know which sites the app scrapes
+3. **Whether automated tests are wanted** — Currently none exist
 
 ### 🟡 Medium Priority
-5. Whether folder structure can ever change (ADR-002 says "do not modify")
-6. Whether 4-folder layout is correct for all use cases
-7. Whether multi-language support is needed
-8. Is "DRKMTTR Studio" the correct publisher name?
+4. Whether folder structure can ever change (ADR-002 says "do not modify")
+5. Whether 4-folder layout is correct for all use cases
+6. Whether multi-language support is needed
+7. Is "DRKMTTR Studio" the correct publisher name?
 
 ### 🟢 Low Priority
-9. Theme color origins (referenced from "Dark Dashboard" image)
-10. Whether window should be resizable
-11. Scrollbar sufficiency on URL and log panels
+8. Theme color origins (referenced from "Dark Dashboard" image)
+9. Whether window should be resizable
+10. Scrollbar sufficiency on URL and log panels
 
 ---
 
@@ -172,10 +165,8 @@ These paths must be updated before compiling on a different machine.
 - No `.env` file
 - No API keys, passwords, tokens in source code
 - No hardcoded credentials
-- Create Installer.iss contains only local paths
 
 ### ⚠️ Notes
-- Create Installer.iss paths reveal Google Drive folder structure
 - Logo_BK.ico present but unused
 
 ---
@@ -196,7 +187,7 @@ These paths must be updated before compiling on a different machine.
 
 ## Last Updated
 
-2026-09-15 — Created from thorough source code inspection
+2026-09-27 — Removed stale hardcoded-path claims (Create Installer.iss uses relative paths); originally created 2026-09-15
 
 | Attribute | Value | Verification |
 |-----------|-------|-------------|
@@ -308,32 +299,25 @@ python -m PyInstaller --noconsole --onedir --icon=icon.ico main.py
 - Compression: LZMA with solid compression
 - Admin privileges required
 
-### ⚠️ Hardcoded Paths in Create Installer.iss
-```
-D:\Google Drive\[Shop] DRKMTTR Studio\[สมศรี Agent]\Key Scraper 2.0\
-```
-These paths must be updated before compiling on a different machine.
-
 ---
 
 ## Items Requiring Owner Confirmation
 
 ### 🔴 High Priority
-1. **Inno Setup hardcoded paths** — Cannot rebuild installer without updating
-2. **Logo_BK.ico purpose** — Exists but not referenced in code
-3. **Target website(s)** — Need to know which sites the app scrapes
-4. **Whether automated tests are wanted** — Currently none exist
+1. **Logo_BK.ico purpose** — Exists but not referenced in code
+2. **Target website(s)** — Need to know which sites the app scrapes
+3. **Whether automated tests are wanted** — Currently none exist
 
 ### 🟡 Medium Priority
-5. Whether folder structure can ever change (ADR-002 says "do not modify")
-6. Whether 4-folder layout is correct for all use cases
-7. Whether multi-language support is needed
-8. Is "DRKMTTR Studio" the correct publisher name?
+4. Whether folder structure can ever change (ADR-002 says "do not modify")
+5. Whether 4-folder layout is correct for all use cases
+6. Whether multi-language support is needed
+7. Is "DRKMTTR Studio" the correct publisher name?
 
 ### 🟢 Low Priority
-9. Theme color origins (referenced from "Dark Dashboard" image)
-10. Whether window should be resizable
-11. Scrollbar sufficiency on URL and log panels
+8. Theme color origins (referenced from "Dark Dashboard" image)
+9. Whether window should be resizable
+10. Scrollbar sufficiency on URL and log panels
 
 ---
 
@@ -360,10 +344,8 @@ These paths must be updated before compiling on a different machine.
 - No `.env` file
 - No API keys, passwords, tokens in source code
 - No hardcoded credentials
-- Create Installer.iss contains only local paths
 
 ### ⚠️ Notes
-- Create Installer.iss paths reveal Google Drive folder structure
 - Logo_BK.ico present but unused
 
 ---
@@ -384,4 +366,4 @@ These paths must be updated before compiling on a different machine.
 
 ## Last Updated
 
-2026-09-15 — Created from thorough source code inspection
+2026-09-27 — Removed stale hardcoded-path claims (Create Installer.iss uses relative paths); originally created 2026-09-15

@@ -132,11 +132,7 @@ Open `Create Installer.iss` in Inno Setup Compiler and click "Compile".
 - Privileges: Admin required
 - Post-install: Launch Key_Scraper.exe (skip if silent)
 
-**⚠️ Important**: The Inno Setup script contains hardcoded local paths:
-```
-D:\Google Drive\[Shop] DRKMTTR Studio\[สมศรี Agent]\Key Scraper 2.0\
-```
-These paths must be updated to match the actual build output location on your machine before compiling.
+**Note**: Inno Setup script uses clean relative paths and can be compiled on any machine.
 
 ### Test 3: Single URL Scraping
 1. Enter one valid URL in the URL text area (one URL per line)
@@ -212,4 +208,4 @@ No type checker is configured. The codebase uses no type hints.
 
 ## Last Updated
 
-2026-09-15 — Populated from repository source code inspection
+2026-09-27 — Inno Setup hardcoded-paths warning removed (script now uses relative paths); originally populated 2026-09-15

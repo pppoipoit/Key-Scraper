@@ -1,6 +1,6 @@
 # Project Handoff — LaptopKey Scraper - Elite Edition v2
 
-**Last updated**: 2026-09-27 — TC-005 Simplify Build: removed separate Win7/Win10 build files, single build for all Windows (Boss decision), commit + push to main
+**Last updated**: 2026-09-27 — Docs cleanup: Single Build decision renumbered to ADR-006 (Boss approved), stale CHANGELOG "separate builds" entries deleted, hardcoded-path warnings removed from PROJECT_COMMANDS / REPOSITORY_AUDIT / HANDOFF — commit + push to main
 **Status**: GitHub Portfolio Setup COMPLETE (Clean Slate 49c344d pushed) — Release v2.0.0 tag + page still pending owner manual publish (gh CLI not installed)
 **Owner**: DRKMTTR Studio (Tokenmee)
 
@@ -112,7 +112,8 @@ Pillow
 ตาราง:
 | Date | Change | Why | Files/modules affected | Validation result |
 |------|--------|-----|------------------------|-------------------|
-| 2026-09-23 | Simplified build: removed separate Win7/Win10 scripts, single build for all Windows | Boss decision | requirements.txt, docs/ | Pushed to GitHub |
+| 2026-09-27 | Docs cleanup: Single Build decision recorded as ADR-006 (resolved numbering conflict), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed | PM order: documentation must reflect absolute truth; Boss approved ADR-006 renumbering | docs/WINDOWS_COMPATIBILITY.md, docs/04_DECISIONS.md, docs/CHANGELOG.md, docs/PROJECT_COMMANDS.md, docs/REPOSITORY_AUDIT.md, docs/HANDOFF.md | Committed + pushed to main |
+| 2026-09-27 | Simplified build: removed separate Win7/Win10 scripts, single build for all Windows | Boss decision | requirements.txt, docs/ | Pushed to GitHub (2e9a4b4) |
 | 2026-09-23 | Docs: added MIT License + Clean Slate status to HANDOFF / ARCHITECTURE / DECISIONS (ADR-005) — no source-code changes | PM request: documentation must match reality (LICENSE, 49c344d, Release v2.0.0 pending) | docs/HANDOFF.md, docs/02_ARCHITECTURE.md, docs/04_DECISIONS.md (+ docs/CURRENT_TASK.md, docs/CHANGELOG.md bookkeeping) | Committed in 78e6766 |
 
 | 2026-09-23 | GitHub Release v2.0.0 — PENDING owner manual publish (no tags in repo; `gh` CLI not installed) | Clean Slate code already on origin main; Release page not yet created | Tag `v2.0.0` (to be created) + Release notes in docs/CHANGELOG.md | `git tag --list` = empty; publish at https://github.com/pppoipoit/Key-Scraper/releases/new |
@@ -180,6 +181,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 | ADR-003 | Custom gradient UI via PIL | Implemented | Custom tkinter widgets rendered with Pillow |
 | ADR-004 | PyInstaller --onedir + Inno Setup | Implemented | Build produces folder + installer, not single exe |
 | ADR-005 | MIT License & Clean Slate Portfolio | Accepted | MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio); Clean Slate force-push 49c344d; Release v2.0.0 pending owner publish |
+| ADR-006 | Single Build for All Windows Versions | Accepted | ONE build script, ONE requirements.txt (Pillow<=9.5.0), ONE build command — Python 3.8 covers Windows 7/8/10/11 |
 
 **See `docs/04_DECISIONS.md` for full decision records.**
 
@@ -240,8 +242,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 1. Review this handoff for accuracy
 2. Answer open questions in `docs/OPEN_QUESTIONS.md`
 3. Decide whether to add automated tests
-4. Update Inno Setup paths if rebuilding installer on a different machine
-5. Select next task from backlog (or propose new feature)
+4. Select next task from backlog (or propose new feature)
 
 ---
 
@@ -254,7 +255,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 > **Key files to read first**:
 > - `docs/HANDOFF.md` (this file) — current status and next actions
 > - `docs/02_ARCHITECTURE.md` — tech stack, module graph, threading model, build process
-> - `docs/04_DECISIONS.md` — ADR-001 to ADR-005 (parallel scraping, folder naming, gradient UI, build approach, MIT License & Clean Slate Portfolio)
+> - `docs/04_DECISIONS.md` — ADR-001 to ADR-006 (parallel scraping, folder naming, gradient UI, build approach, MIT License & Clean Slate Portfolio, single build for all Windows)
 > - `docs/PROJECT_COMMANDS.md` — run/build/test commands, manual test steps
 > - `.clinerules/00-core-workflow.md` — required workflow before any task
 > 
@@ -270,6 +271,7 @@ ONE build for Windows 7/8/10/11 (see `docs/WINDOWS_COMPATIBILITY.md`):
 
 ## Last Updated
 
+2026-09-27 — Docs cleanup: ADR conflict resolved (Single Build recorded as ADR-006 in 04_DECISIONS.md + WINDOWS_COMPATIBILITY.md), stale CHANGELOG "separate builds" lines deleted, hardcoded-path warnings removed from PROJECT_COMMANDS.md / REPOSITORY_AUDIT.md / HANDOFF.md — .md files only, no .py changes, committed + pushed to main
 2026-09-27 — TC-005: Simplify build — deleted build_win7.bat, build_win10.bat, requirements-win7.txt, requirements-win10.txt; single requirements.txt with Pillow<=9.5.0; updated docs/WINDOWS_COMPATIBILITY.md, README.md, HANDOFF.md, CHANGELOG.md, CURRENT_TASK.md — docs/config only, no .py changes, committed + pushed to main
 - **Environment**: Python 3.8.10 on build machine (Windows 7-compatible); requests/beautifulsoup4/Pillow not installed machine-wide
 - **License**: MIT License (Copyright (c) 2026 pppoipoit x DRKMTTR Studio) — root LICENSE, tracked in git
