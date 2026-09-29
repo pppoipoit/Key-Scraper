@@ -2,6 +2,12 @@
 
 > 🚀 Elite desktop tool for scraping laptop keyboard images and auto-organizing them by brand & key type.
 
+![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)
+![Windows](https://img.shields.io/badge/OS-Windows_7/10/11-blue?logo=windows)
+![Tests](https://img.shields.io/badge/Tests-26_Passing-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Release](https://img.shields.io/github/v/release/pppoipoit/Key-Scraper?label=Latest%20Release&color=green)
+
 ---
 
 ## ✨ Features
